@@ -35,6 +35,8 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/.bin ./node_modules/.bin
+# bcryptjs para el seed (Next lo bundlea en sus chunks, no queda resolvible)
+COPY --from=builder /app/node_modules/bcryptjs ./node_modules/bcryptjs
 COPY docker-entrypoint.sh ./docker-entrypoint.sh
 
 RUN mkdir -p /data && chown -R nextjs:nodejs /data /app/public && chmod +x docker-entrypoint.sh
