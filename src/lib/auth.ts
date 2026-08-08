@@ -33,6 +33,11 @@ export async function createSession(userId: string) {
   });
 }
 
+/** Token de la sesión actual (para excluirla al invalidar sesiones ajenas). */
+export function getSessionToken() {
+  return cookies().get(SESSION_COOKIE)?.value ?? null;
+}
+
 export async function getSessionUser() {
   const token = cookies().get(SESSION_COOKIE)?.value;
   if (!token) return null;
