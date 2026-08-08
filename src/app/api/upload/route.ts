@@ -28,7 +28,9 @@ export async function POST(req: NextRequest) {
 
     const ext = path.extname(file.name).toLowerCase() || '.jpg';
     const filename = `${crypto.randomUUID()}${ext}`;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+    // Fuera de public/: next start solo sirve estáticos presentes al build,
+    // así que /uploads/* se sirve vía route handler desde el dir de datos.
+    const uploadDir = process.env.UPLOADS_DIR ?? path.join(process.cwd(), 'data', 'uploads');
 
     await mkdir(uploadDir, { recursive: true });
 

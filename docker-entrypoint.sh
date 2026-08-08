@@ -1,10 +1,9 @@
 #!/bin/sh
 set -e
 
-# Uploads persistentes dentro del volumen /data
+# Uploads persistentes dentro del volumen /data (servidos por la app
+# vía /uploads/[name], no como estáticos de public/)
 mkdir -p /data/uploads
-rm -rf /app/public/uploads
-ln -sfn /data/uploads /app/public/uploads
 
 # Migraciones automáticas al arrancar
 node_modules/.bin/prisma migrate deploy

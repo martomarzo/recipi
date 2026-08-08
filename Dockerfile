@@ -20,6 +20,7 @@ ENV DATABASE_URL="file:/data/app.db"
 # Chromium para el export a PDF (puppeteer-core lo usa vía esta ruta)
 RUN apk add --no-cache chromium font-noto ttf-liberation
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV UPLOADS_DIR=/data/uploads
 
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
