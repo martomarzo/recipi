@@ -3,5 +3,44 @@
 @tailwind utilities;
 
 body {
-  background-color: #fafaf8;
+  background-color: #faf7f2;
+  color: #2e332e;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  /* Marca tipo "p r o t o c o l o" */
+  .brand-spaced {
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .card {
+    @apply rounded-card border border-linea bg-white shadow-sm;
+  }
+
+  .chip {
+    @apply inline-flex min-h-[28px] items-center gap-1 rounded-full border border-linea bg-white px-3 py-1 text-sm;
+  }
+
+  .btn {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-linea bg-white px-5 py-2 text-sm font-semibold text-tinta transition-colors hover:border-tinta-suave;
+  }
+
+  .btn-primario {
+    @apply btn border-tinta bg-tinta text-crema hover:border-tinta hover:bg-tinta/90;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-linea bg-white px-4 py-2.5 text-tinta placeholder:text-tinta-suave/60 focus:border-salvia-osc focus:outline-none;
+  }
+}
+
+@media print {
+  body {
+    background: white;
+  }
+  .no-print {
+    display: none !important;
+  }
 }

@@ -1,32 +1,39 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import Logo from '@/components/Logo';
+import type { Metadata, Viewport } from 'next';
+import { getSessionUser } from '@/lib/auth';
+import NavMenu from '@/components/NavMenu';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Recipi',
-  description: 'Your personal recipe collection',
+  title: 'Protocolo',
+  description: 'Planes de alimentación por fases',
+  manifest: '/manifest.webmanifest',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const viewport: Viewport = {
+  themeColor: '#FAF7F2',
+  width: 'device-width',
+  initialScale: 1,
+};
+
+export const dynamic = 'force-dynamic';
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const user = await getSessionUser();
   return (
-    <html lang="en">
+    <html lang="es">
       <body className="min-h-screen">
-        <header className="sticky top-0 z-10 border-b border-amber-100 bg-white/90 backdrop-blur-sm">
-          <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-            <Link href="/" className="flex items-center gap-2.5">
-              <Logo size={32} />
-              <span className="text-xl font-bold text-amber-700 tracking-tight">Recipi</span>
-            </Link>
-            <Link
-              href="/recipes/new"
-              className="rounded-lg bg-amber-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-amber-700 transition-colors"
-            >
-              + New Recipe
-            </Link>
+        <header className="no-print sticky top-0 z-50 border-b border-linea bg-crema/95 backdrop-blur">
+          <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-4 py-2.5">
+            <a href="/" className="leading-tight">
+              <span className="font-display text-lg font-semibold">Protocolo</span>
+              <small className="brand-spaced block text-[10.5px] font-bold text-salvia-osc">
+                plan por fases
+              </small>
+            </a>
+            {user && <NavMenu userName={user.name} />}
           </div>
         </header>
-        <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+        <main className="mx-auto max-w-5xl px-4 pb-20 pt-6">{children}</main>
       </body>
     </html>
   );

@@ -1,0 +1,32 @@
+{
+  "fases": {
+    "exclusion": {
+      "nombre": "Exclusión",
+      "color": "var(--salvia)",
+      "hex": "#3F5741",
+      "desc": "Reducir la inflamación y reparar la barrera intestinal eliminando irritantes."
+    },
+    "probioticos": {
+      "nombre": "Probióticos",
+      "color": "var(--azul)",
+      "hex": "#4A6B8C",
+      "desc": "Misma dieta de exclusión + probióticos (ej. Bonusan Bacteri 17 Resilience Pro, 1 sobre después de comer)."
+    },
+    "reintroduccion": {
+      "nombre": "Reintroducción",
+      "color": "var(--terra)",
+      "hex": "#8F5F2E",
+      "desc": "Reintroducir alimentos de a uno, con la regla de los 4 días."
+    },
+    "mantenimiento": {
+      "nombre": "Mantenimiento",
+      "color": "var(--neutro)",
+      "hex": "#7d7970",
+      "desc": "Dieta ampliada con todo lo que toleraste."
+    }
+  },
+  "DIAS_EXCLUSION": 21,
+  "DIAS_PROBIO": 7,
+  "DIAS_BLOQUE": 4,
+  "inicio": "2026-08-03"
+}

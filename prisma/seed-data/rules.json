@@ -1,0 +1,135 @@
+{
+  "BASE": [
+    {
+      "g": "🐟 Proteínas",
+      "ids": [
+        "arenque",
+        "sardina",
+        "salmon",
+        "caballa",
+        "bacalao",
+        "pollo",
+        "pavo",
+        "carne",
+        "huevo",
+        "almejas",
+        "mejillones",
+        "pulpo"
+      ]
+    },
+    {
+      "g": "🥑 Grasas saludables",
+      "ids": [
+        "oliva",
+        "palta",
+        "aceiteCoco",
+        "nuecesBrasil",
+        "macadamias",
+        "avellanas",
+        "almendras"
+      ]
+    },
+    {
+      "g": "🥕 Vegetales cocidos",
+      "ids": [
+        "calabacin",
+        "calabaza",
+        "canonigos",
+        "berenjena",
+        "esparragos",
+        "espinaca",
+        "rabano",
+        "pimiento",
+        "puerro",
+        "rucula",
+        "tomate",
+        "zanahoria",
+        "zapallo"
+      ]
+    },
+    {
+      "g": "🍚 Tubérculos y arroz",
+      "ids": [
+        "boniato",
+        "papa",
+        "yuca",
+        "arroz"
+      ]
+    },
+    {
+      "g": "🫐 Frutas (baja carga glucémica)",
+      "ids": [
+        "arandanos",
+        "moras",
+        "frambuesas",
+        "fresas",
+        "limon",
+        "coco"
+      ]
+    },
+    {
+      "g": "🍄 Otros",
+      "ids": [
+        "champinones",
+        "jengibre",
+        "curcuma",
+        "canela",
+        "teVerde",
+        "caldo"
+      ]
+    }
+  ],
+  "EVITAR": [
+    [
+      "Lácteos (todos)",
+      "leche, queso, yogur y kéfir — vaca, cabra u oveja"
+    ],
+    [
+      "Gluten y cereales",
+      "trigo, centeno, cebada y avena (en esta fase)"
+    ],
+    [
+      "Legumbres",
+      "alubias, lentejas, garbanzos, soja/tofu"
+    ],
+    [
+      "Ultraprocesados y aditivos",
+      "glutamato monosódico, sulfitos, edulcorantes artificiales"
+    ],
+    [
+      "Azúcares",
+      "azúcar blanco, harinas refinadas, gaseosas, jugos industriales"
+    ],
+    [
+      "Grasas de mala calidad",
+      "aceites refinados (girasol, maíz), margarinas, grasas trans"
+    ]
+  ],
+  "REGLAS_DIARIAS": [
+    "Máximo <b>3 ingestas al día</b> (deja actuar al Complejo Motor Migratorio).",
+    "<b>Cena temprana y ligera</b>: al menos 3 h antes de dormir (salvo guardia).",
+    "Mantener el <b>Gut Day</b> antes de las comidas durante todo el protocolo."
+  ],
+  "REGLAS_REINTRO": [
+    "Un solo alimento nuevo <b>a la vez</b>.",
+    "<b>Regla de los 4 días</b>: empezar con cantidad mínima e ir aumentando; observar gases, calor en piel, cambios de tránsito.",
+    "<b>No introducir</b> un alimento nuevo después de una noche de guardia sin dormir (falso positivo).",
+    "Ante reacción: retirar el alimento y volver al último punto bien tolerado."
+  ],
+  "GANTT_BLOQUE": {
+    "manzana": 0,
+    "pera": 0,
+    "brocoli": 2,
+    "coliflor": 2,
+    "quinoa": 3,
+    "sarraceno": 4,
+    "avenaSG": 5,
+    "lentejas": 6,
+    "chucrut": 7,
+    "quesoCabra": 8,
+    "panEspelta": 9,
+    "quesoVaca": 10,
+    "yogur": 10,
+    "leche": 10
+  }
+}

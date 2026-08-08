@@ -1,0 +1,624 @@
+{
+  "arenque": {
+    "id": "arenque",
+    "n": "Arenque",
+    "cat": "proteinas",
+    "e": "🐟",
+    "kcal": 203,
+    "protein": 18,
+    "carbs": 0,
+    "fat": 13
+  },
+  "sardina": {
+    "id": "sardina",
+    "n": "Sardina",
+    "cat": "proteinas",
+    "e": "🐟",
+    "kcal": 208,
+    "protein": 25,
+    "carbs": 0,
+    "fat": 11
+  },
+  "salmon": {
+    "id": "salmon",
+    "n": "Salmón",
+    "cat": "proteinas",
+    "e": "🐟",
+    "kcal": 208,
+    "protein": 20,
+    "carbs": 0,
+    "fat": 13
+  },
+  "caballa": {
+    "id": "caballa",
+    "n": "Caballa",
+    "cat": "proteinas",
+    "e": "🐟",
+    "kcal": 205,
+    "protein": 19,
+    "carbs": 0,
+    "fat": 14
+  },
+  "bacalao": {
+    "id": "bacalao",
+    "n": "Bacalao",
+    "cat": "proteinas",
+    "e": "🐟",
+    "kcal": 82,
+    "protein": 18,
+    "carbs": 0,
+    "fat": 0.7
+  },
+  "pollo": {
+    "id": "pollo",
+    "n": "Pollo",
+    "cat": "proteinas",
+    "e": "🍗",
+    "kcal": 165,
+    "protein": 27,
+    "carbs": 0,
+    "fat": 6
+  },
+  "pavo": {
+    "id": "pavo",
+    "n": "Pavo",
+    "cat": "proteinas",
+    "e": "🦃",
+    "kcal": 135,
+    "protein": 29,
+    "carbs": 0,
+    "fat": 1
+  },
+  "carne": {
+    "id": "carne",
+    "n": "Carne vacuna",
+    "cat": "proteinas",
+    "e": "🥩",
+    "kcal": 250,
+    "protein": 26,
+    "carbs": 0,
+    "fat": 15
+  },
+  "huevo": {
+    "id": "huevo",
+    "n": "Huevos",
+    "cat": "proteinas",
+    "e": "🥚",
+    "kcal": 143,
+    "protein": 13,
+    "carbs": 1,
+    "fat": 10
+  },
+  "almejas": {
+    "id": "almejas",
+    "n": "Almejas",
+    "cat": "proteinas",
+    "e": "🐚",
+    "kcal": 74,
+    "protein": 13,
+    "carbs": 3,
+    "fat": 1
+  },
+  "mejillones": {
+    "id": "mejillones",
+    "n": "Mejillones",
+    "cat": "proteinas",
+    "e": "🦪",
+    "kcal": 86,
+    "protein": 12,
+    "carbs": 4,
+    "fat": 2
+  },
+  "pulpo": {
+    "id": "pulpo",
+    "n": "Pulpo",
+    "cat": "proteinas",
+    "e": "🐙",
+    "kcal": 82,
+    "protein": 15,
+    "carbs": 2,
+    "fat": 1
+  },
+  "oliva": {
+    "id": "oliva",
+    "n": "Aceite de oliva",
+    "cat": "grasas",
+    "e": "🫒",
+    "kcal": 884,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 100
+  },
+  "palta": {
+    "id": "palta",
+    "n": "Palta",
+    "cat": "grasas",
+    "e": "🥑",
+    "kcal": 160,
+    "protein": 2,
+    "carbs": 9,
+    "fat": 15
+  },
+  "aceiteCoco": {
+    "id": "aceiteCoco",
+    "n": "Aceite de coco",
+    "cat": "grasas",
+    "e": "🥥",
+    "kcal": 862,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 100
+  },
+  "nuecesBrasil": {
+    "id": "nuecesBrasil",
+    "n": "Nueces de Brasil",
+    "cat": "grasas",
+    "e": "🌰",
+    "kcal": 659,
+    "protein": 14,
+    "carbs": 12,
+    "fat": 67
+  },
+  "macadamias": {
+    "id": "macadamias",
+    "n": "Macadamias",
+    "cat": "grasas",
+    "e": "🌰",
+    "kcal": 718,
+    "protein": 8,
+    "carbs": 14,
+    "fat": 76
+  },
+  "avellanas": {
+    "id": "avellanas",
+    "n": "Avellanas",
+    "cat": "grasas",
+    "e": "🌰",
+    "kcal": 628,
+    "protein": 15,
+    "carbs": 17,
+    "fat": 61
+  },
+  "almendras": {
+    "id": "almendras",
+    "n": "Almendras remojadas",
+    "cat": "grasas",
+    "e": "🌰",
+    "kcal": 579,
+    "protein": 21,
+    "carbs": 22,
+    "fat": 50
+  },
+  "calabacin": {
+    "id": "calabacin",
+    "n": "Calabacín",
+    "cat": "vegetales",
+    "e": "🥒",
+    "kcal": 17,
+    "protein": 1.2,
+    "carbs": 3,
+    "fat": 0.3,
+    "nota": "sin piel ni semillas"
+  },
+  "calabaza": {
+    "id": "calabaza",
+    "n": "Calabaza",
+    "cat": "vegetales",
+    "e": "🎃",
+    "kcal": 26,
+    "protein": 1,
+    "carbs": 6.5,
+    "fat": 0.1
+  },
+  "canonigos": {
+    "id": "canonigos",
+    "n": "Canónigos",
+    "cat": "vegetales",
+    "e": "🥬",
+    "kcal": 21,
+    "protein": 2,
+    "carbs": 3.6,
+    "fat": 0.4
+  },
+  "berenjena": {
+    "id": "berenjena",
+    "n": "Berenjena",
+    "cat": "vegetales",
+    "e": "🍆",
+    "kcal": 25,
+    "protein": 1,
+    "carbs": 6,
+    "fat": 0.2
+  },
+  "esparragos": {
+    "id": "esparragos",
+    "n": "Espárragos",
+    "cat": "vegetales",
+    "e": "🌿",
+    "kcal": 20,
+    "protein": 2.2,
+    "carbs": 3.9,
+    "fat": 0.1
+  },
+  "espinaca": {
+    "id": "espinaca",
+    "n": "Espinaca",
+    "cat": "vegetales",
+    "e": "🥬",
+    "kcal": 23,
+    "protein": 2.9,
+    "carbs": 3.6,
+    "fat": 0.4
+  },
+  "rabano": {
+    "id": "rabano",
+    "n": "Rábano y raíces",
+    "cat": "vegetales",
+    "e": "🌱",
+    "kcal": 16,
+    "protein": 0.7,
+    "carbs": 3.4,
+    "fat": 0.1
+  },
+  "pimiento": {
+    "id": "pimiento",
+    "n": "Pimientos",
+    "cat": "vegetales",
+    "e": "🫑",
+    "kcal": 31,
+    "protein": 1,
+    "carbs": 6,
+    "fat": 0.3
+  },
+  "puerro": {
+    "id": "puerro",
+    "n": "Puerro",
+    "cat": "vegetales",
+    "e": "🥬",
+    "kcal": 61,
+    "protein": 1.5,
+    "carbs": 14,
+    "fat": 0.3
+  },
+  "rucula": {
+    "id": "rucula",
+    "n": "Rúcula",
+    "cat": "vegetales",
+    "e": "🥬",
+    "kcal": 25,
+    "protein": 2.6,
+    "carbs": 3.7,
+    "fat": 0.7
+  },
+  "tomate": {
+    "id": "tomate",
+    "n": "Tomate",
+    "cat": "vegetales",
+    "e": "🍅",
+    "kcal": 18,
+    "protein": 0.9,
+    "carbs": 3.9,
+    "fat": 0.2
+  },
+  "zanahoria": {
+    "id": "zanahoria",
+    "n": "Zanahoria",
+    "cat": "vegetales",
+    "e": "🥕",
+    "kcal": 41,
+    "protein": 0.9,
+    "carbs": 10,
+    "fat": 0.2
+  },
+  "zapallo": {
+    "id": "zapallo",
+    "n": "Zapallo",
+    "cat": "vegetales",
+    "e": "🎃",
+    "kcal": 26,
+    "protein": 1,
+    "carbs": 6.5,
+    "fat": 0.1
+  },
+  "champinones": {
+    "id": "champinones",
+    "n": "Hongos y champiñones",
+    "cat": "vegetales",
+    "e": "🍄",
+    "kcal": 22,
+    "protein": 3.1,
+    "carbs": 3.3,
+    "fat": 0.3
+  },
+  "boniato": {
+    "id": "boniato",
+    "n": "Boniato",
+    "cat": "tuberculos",
+    "e": "🍠",
+    "kcal": 86,
+    "protein": 1.6,
+    "carbs": 20,
+    "fat": 0.1
+  },
+  "papa": {
+    "id": "papa",
+    "n": "Papa",
+    "cat": "tuberculos",
+    "e": "🥔",
+    "kcal": 77,
+    "protein": 2,
+    "carbs": 17,
+    "fat": 0.1
+  },
+  "yuca": {
+    "id": "yuca",
+    "n": "Yuca",
+    "cat": "tuberculos",
+    "e": "🥔",
+    "kcal": 160,
+    "protein": 1.4,
+    "carbs": 38,
+    "fat": 0.3
+  },
+  "arroz": {
+    "id": "arroz",
+    "n": "Arroz cocido",
+    "cat": "tuberculos",
+    "e": "🍚",
+    "kcal": 130,
+    "protein": 2.7,
+    "carbs": 28,
+    "fat": 0.3
+  },
+  "arandanos": {
+    "id": "arandanos",
+    "n": "Arándanos",
+    "cat": "frutas",
+    "e": "🫐",
+    "kcal": 57,
+    "protein": 0.7,
+    "carbs": 14,
+    "fat": 0.3
+  },
+  "moras": {
+    "id": "moras",
+    "n": "Moras",
+    "cat": "frutas",
+    "e": "🫐",
+    "kcal": 43,
+    "protein": 1.4,
+    "carbs": 10,
+    "fat": 0.5
+  },
+  "frambuesas": {
+    "id": "frambuesas",
+    "n": "Frambuesas",
+    "cat": "frutas",
+    "e": "🍓",
+    "kcal": 52,
+    "protein": 1.2,
+    "carbs": 12,
+    "fat": 0.7
+  },
+  "fresas": {
+    "id": "fresas",
+    "n": "Fresas",
+    "cat": "frutas",
+    "e": "🍓",
+    "kcal": 32,
+    "protein": 0.7,
+    "carbs": 7.7,
+    "fat": 0.3
+  },
+  "limon": {
+    "id": "limon",
+    "n": "Limón",
+    "cat": "frutas",
+    "e": "🍋",
+    "kcal": 29,
+    "protein": 1.1,
+    "carbs": 9,
+    "fat": 0.3
+  },
+  "coco": {
+    "id": "coco",
+    "n": "Coco",
+    "cat": "frutas",
+    "e": "🥥",
+    "kcal": 354,
+    "protein": 3.3,
+    "carbs": 15,
+    "fat": 33
+  },
+  "jengibre": {
+    "id": "jengibre",
+    "n": "Jengibre",
+    "cat": "otros",
+    "e": "🫚",
+    "kcal": 80,
+    "protein": 1.8,
+    "carbs": 18,
+    "fat": 0.8
+  },
+  "curcuma": {
+    "id": "curcuma",
+    "n": "Cúrcuma",
+    "cat": "otros",
+    "e": "🟠",
+    "kcal": 354,
+    "protein": 8,
+    "carbs": 65,
+    "fat": 10
+  },
+  "canela": {
+    "id": "canela",
+    "n": "Canela",
+    "cat": "otros",
+    "e": "🟤",
+    "kcal": 247,
+    "protein": 4,
+    "carbs": 81,
+    "fat": 1.2
+  },
+  "teVerde": {
+    "id": "teVerde",
+    "n": "Té verde",
+    "cat": "otros",
+    "e": "🍵",
+    "kcal": 1,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 0
+  },
+  "caldo": {
+    "id": "caldo",
+    "n": "Caldo de huesos",
+    "cat": "otros",
+    "e": "🍲",
+    "kcal": 30,
+    "protein": 6,
+    "carbs": 0,
+    "fat": 0.5
+  },
+  "manzana": {
+    "id": "manzana",
+    "n": "Manzana",
+    "cat": "reintro",
+    "e": "🍎",
+    "kcal": 52,
+    "protein": 0.3,
+    "carbs": 14,
+    "fat": 0.2
+  },
+  "pera": {
+    "id": "pera",
+    "n": "Pera",
+    "cat": "reintro",
+    "e": "🍐",
+    "kcal": 57,
+    "protein": 0.4,
+    "carbs": 15,
+    "fat": 0.1
+  },
+  "brocoli": {
+    "id": "brocoli",
+    "n": "Brócoli",
+    "cat": "reintro",
+    "e": "🥦",
+    "kcal": 34,
+    "protein": 2.8,
+    "carbs": 7,
+    "fat": 0.4
+  },
+  "coliflor": {
+    "id": "coliflor",
+    "n": "Coliflor",
+    "cat": "reintro",
+    "e": "🥦",
+    "kcal": 25,
+    "protein": 1.9,
+    "carbs": 5,
+    "fat": 0.3
+  },
+  "quinoa": {
+    "id": "quinoa",
+    "n": "Quinoa cocida",
+    "cat": "reintro",
+    "e": "🌾",
+    "kcal": 120,
+    "protein": 4.4,
+    "carbs": 21,
+    "fat": 1.9
+  },
+  "sarraceno": {
+    "id": "sarraceno",
+    "n": "Trigo sarraceno cocido",
+    "cat": "reintro",
+    "e": "🥞",
+    "kcal": 92,
+    "protein": 3.4,
+    "carbs": 20,
+    "fat": 0.6
+  },
+  "avenaSG": {
+    "id": "avenaSG",
+    "n": "Avena sin gluten",
+    "cat": "reintro",
+    "e": "🥣",
+    "kcal": 389,
+    "protein": 17,
+    "carbs": 66,
+    "fat": 7
+  },
+  "lentejas": {
+    "id": "lentejas",
+    "n": "Lentejas cocidas",
+    "cat": "reintro",
+    "e": "🫘",
+    "kcal": 116,
+    "protein": 9,
+    "carbs": 20,
+    "fat": 0.4,
+    "nota": "remojadas y bien cocidas"
+  },
+  "chucrut": {
+    "id": "chucrut",
+    "n": "Chucrut",
+    "cat": "reintro",
+    "e": "🫙",
+    "kcal": 19,
+    "protein": 0.9,
+    "carbs": 4.3,
+    "fat": 0.1
+  },
+  "quesoCabra": {
+    "id": "quesoCabra",
+    "n": "Queso de cabra curado",
+    "cat": "reintro",
+    "e": "🐐",
+    "kcal": 452,
+    "protein": 30,
+    "carbs": 2,
+    "fat": 36
+  },
+  "panEspelta": {
+    "id": "panEspelta",
+    "n": "Pan de espelta masa madre",
+    "cat": "reintro",
+    "e": "🍞",
+    "kcal": 240,
+    "protein": 9,
+    "carbs": 48,
+    "fat": 1.5
+  },
+  "quesoVaca": {
+    "id": "quesoVaca",
+    "n": "Queso duro de vaca",
+    "cat": "reintro",
+    "e": "🧀",
+    "kcal": 400,
+    "protein": 25,
+    "carbs": 1.3,
+    "fat": 33
+  },
+  "yogur": {
+    "id": "yogur",
+    "n": "Yogur",
+    "cat": "reintro",
+    "e": "🥛",
+    "kcal": 61,
+    "protein": 3.5,
+    "carbs": 4.7,
+    "fat": 3.3
+  },
+  "leche": {
+    "id": "leche",
+    "n": "Leche",
+    "cat": "reintro",
+    "e": "🥛",
+    "kcal": 64,
+    "protein": 3.3,
+    "carbs": 4.8,
+    "fat": 3.6
+  }
+}

@@ -9,11 +9,14 @@
     "lint": "next lint",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "seed": "node prisma/seed.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.91.0",
     "@prisma/client": "^5.13.0",
+    "@types/bcryptjs": "^2.4.6",
+    "bcryptjs": "^3.0.3",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18"

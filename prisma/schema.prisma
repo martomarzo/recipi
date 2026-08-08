@@ -3,45 +3,217 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-model Recipe {
-  id          String       @id @default(cuid())
+// ── Auth ────────────────────────────────────────────────────────────────
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime   @default(now())
+  diets        Diet[]
+  dishes       Dish[]
+  sessions     Session[]
+  invitations  Invitation[]
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Invitation {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  createdBy String
+  usedAt    DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  creator   User      @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+}
+
+// ── Catálogo global ─────────────────────────────────────────────────────
+
+model IngredientCategory {
+  id          Int          @id @default(autoincrement())
+  key         String       @unique // "proteinas", "grasas", …
   name        String
-  description String?      @db.Text
-  rawText     String       @db.Text
-  imageUrl    String?
+  emoji       String
+  sort        Int          @default(0)
   ingredients Ingredient[]
-  steps       Step[]
-  ratings     Rating[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  rules       PhaseIngredientRule[]
 }
 
 model Ingredient {
-  id       Int     @id @default(autoincrement())
-  recipeId String
-  position Int
-  quantity String?
-  unit     String?
-  name     String
-  recipe   Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  id         Int      @id @default(autoincrement())
+  key        String   @unique // id estable del prototipo, p.ej. "salmon"
+  categoryId Int
+  name       String
+  notes      String?
+  emoji      String?
+  imagePath  String?
+  kcal100    Float
+  protein100 Float
+  carbs100   Float
+  fat100     Float
+  fiber100   Float?
+  archivedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  category      IngredientCategory        @relation(fields: [categoryId], references: [id])
+  dishUses      DishIngredient[]
+  rules         PhaseIngredientRule[]
+  reintroBlocks ReintroBlockIngredient[]
 }
 
-model Step {
-  id       Int    @id @default(autoincrement())
-  recipeId String
-  position Int
-  text     String @db.Text
-  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+// ── Dietas ──────────────────────────────────────────────────────────────
+
+model Diet {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  startDate   DateTime // solo fecha; hora ignorada
+  isActive    Boolean   @default(false)
+  archivedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phases      Phase[]
+  suggestions DishSuggestion[]
+  tracking    TrackingEntry[]
+
+  @@index([userId])
 }
 
-model Rating {
-  id        Int      @id @default(autoincrement())
-  recipeId  String
-  stars     Int
+model Phase {
+  id              String  @id @default(cuid())
+  dietId          String
+  name            String
+  type            String // exclusion | probioticos | reintroduccion | mantenimiento | custom
+  sort            Int
+  startOffsetDays Int
+  durationDays    Int? // null = abierta (mantenimiento)
+  color           String // token de fase: salvia | azul | terra | neutro
+  description     String?
+  dailyRulesMd    String?
+
+  diet        Diet                  @relation(fields: [dietId], references: [id], onDelete: Cascade)
+  blocks      ReintroBlock[]
+  rules       PhaseIngredientRule[]
+  suggestions DishSuggestion[]
+
+  @@index([dietId])
+}
+
+model ReintroBlock {
+  id           String  @id @default(cuid())
+  phaseId      String
+  sort         Int
+  name         String
+  emoji        String?
+  durationDays Int     @default(4)
+  tipsMd       String?
+  status       String  @default("pendiente") // pendiente | en_prueba | tolerado | con_sintomas
+  statusNote   String?
+
+  phase       Phase                    @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  ingredients ReintroBlockIngredient[]
+  suggestions DishSuggestion[]
+
+  @@index([phaseId])
+}
+
+model ReintroBlockIngredient {
+  blockId      String
+  ingredientId Int
+  block        ReintroBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  ingredient   Ingredient   @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@id([blockId, ingredientId])
+}
+
+model PhaseIngredientRule {
+  id           String  @id @default(cuid())
+  phaseId      String
+  ingredientId Int?
+  categoryId   Int?
+  rule         String // permitido | evitar
+  note         String?
+
+  phase      Phase               @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  ingredient Ingredient?         @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  category   IngredientCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([phaseId])
+}
+
+// ── Recetas ─────────────────────────────────────────────────────────────
+
+model Dish {
+  id          String  @id @default(cuid())
+  userId      String? // null = global (seed)
+  name        String
+  description String?
+  mealType    String // desayuno | comida | cena | snack
+  recipeMd    String? // pasos / preparación
+  sourceUrl   String? // si vino de un link importado
+  rawText     String? // texto original importado (para re-parsear)
+  parsedJson  String? // líneas de ingredientes parseadas aún sin mapear al catálogo
+  createdAt   DateTime @default(now())
+  archivedAt  DateTime?
+
+  user        User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  ingredients DishIngredient[]
+  suggestions DishSuggestion[]
+}
+
+model DishIngredient {
+  dishId       String
+  ingredientId Int
+  grams        Float
+  sort         Int    @default(0)
+  dish         Dish       @relation(fields: [dishId], references: [id], onDelete: Cascade)
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@id([dishId, ingredientId])
+}
+
+model DishSuggestion {
+  id         String  @id @default(cuid())
+  dishId     String
+  dietId     String?
+  phaseId    String?
+  blockId    String?
+  weekNumber Int?
+
+  dish  Dish          @relation(fields: [dishId], references: [id], onDelete: Cascade)
+  diet  Diet?         @relation(fields: [dietId], references: [id], onDelete: Cascade)
+  phase Phase?        @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  block ReintroBlock? @relation(fields: [blockId], references: [id], onDelete: Cascade)
+
+  @@index([dietId])
+  @@index([dishId])
+}
+
+// ── Registro diario ─────────────────────────────────────────────────────
+
+model TrackingEntry {
+  id        String   @id @default(cuid())
+  dietId    String
+  date      DateTime
+  noteMd    String
   createdAt DateTime @default(now())
-  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  diet      Diet     @relation(fields: [dietId], references: [id], onDelete: Cascade)
+
+  @@index([dietId, date])
 }

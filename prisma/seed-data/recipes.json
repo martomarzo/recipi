@@ -1,0 +1,580 @@
+[
+  {
+    "n": "Tortilla de huevos con champiñones y espinaca",
+    "t": "desayuno",
+    "fase": "base",
+    "ing": [
+      [
+        "huevo",
+        120
+      ],
+      [
+        "champinones",
+        80
+      ],
+      [
+        "espinaca",
+        60
+      ],
+      [
+        "oliva",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Bowl de frutos rojos con coco y avellanas",
+    "t": "desayuno",
+    "fase": "base",
+    "ing": [
+      [
+        "arandanos",
+        80
+      ],
+      [
+        "frambuesas",
+        60
+      ],
+      [
+        "coco",
+        20
+      ],
+      [
+        "avellanas",
+        20
+      ]
+    ]
+  },
+  {
+    "n": "Huevos revueltos con palta y tomate asado",
+    "t": "desayuno",
+    "fase": "base",
+    "ing": [
+      [
+        "huevo",
+        120
+      ],
+      [
+        "palta",
+        70
+      ],
+      [
+        "tomate",
+        80
+      ],
+      [
+        "oliva",
+        5
+      ]
+    ]
+  },
+  {
+    "n": "Salmón al horno con puré de calabaza",
+    "t": "comida",
+    "fase": "base",
+    "ing": [
+      [
+        "salmon",
+        150
+      ],
+      [
+        "calabaza",
+        250
+      ],
+      [
+        "oliva",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Pollo al limón con boniato y zanahorias",
+    "t": "comida",
+    "fase": "base",
+    "ing": [
+      [
+        "pollo",
+        150
+      ],
+      [
+        "boniato",
+        200
+      ],
+      [
+        "zanahoria",
+        100
+      ],
+      [
+        "limon",
+        30
+      ],
+      [
+        "oliva",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Wok de carne con pimientos, calabacín y arroz",
+    "t": "comida",
+    "fase": "base",
+    "ing": [
+      [
+        "carne",
+        130
+      ],
+      [
+        "pimiento",
+        80
+      ],
+      [
+        "calabacin",
+        100
+      ],
+      [
+        "arroz",
+        150
+      ],
+      [
+        "jengibre",
+        5
+      ],
+      [
+        "oliva",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Sardinas con tomate y puerro asados",
+    "t": "comida",
+    "fase": "base",
+    "ing": [
+      [
+        "sardina",
+        120
+      ],
+      [
+        "tomate",
+        150
+      ],
+      [
+        "puerro",
+        80
+      ],
+      [
+        "papa",
+        150
+      ],
+      [
+        "oliva",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Mejillones al vapor con limón y papas",
+    "t": "comida",
+    "fase": "base",
+    "ing": [
+      [
+        "mejillones",
+        200
+      ],
+      [
+        "limon",
+        30
+      ],
+      [
+        "papa",
+        200
+      ],
+      [
+        "oliva",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Bacalao con puré de boniato y espárragos",
+    "t": "comida",
+    "fase": "base",
+    "ing": [
+      [
+        "bacalao",
+        150
+      ],
+      [
+        "boniato",
+        200
+      ],
+      [
+        "esparragos",
+        100
+      ],
+      [
+        "oliva",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Berenjenas rellenas de pavo",
+    "t": "comida",
+    "fase": "base",
+    "ing": [
+      [
+        "berenjena",
+        200
+      ],
+      [
+        "pavo",
+        120
+      ],
+      [
+        "tomate",
+        80
+      ],
+      [
+        "curcuma",
+        2
+      ],
+      [
+        "oliva",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Caldo de huesos con raíces y jengibre",
+    "t": "cena",
+    "fase": "base",
+    "ing": [
+      [
+        "caldo",
+        300
+      ],
+      [
+        "zanahoria",
+        80
+      ],
+      [
+        "rabano",
+        50
+      ],
+      [
+        "jengibre",
+        5
+      ]
+    ]
+  },
+  {
+    "n": "Crema de calabaza y zanahoria con cúrcuma",
+    "t": "cena",
+    "fase": "base",
+    "ing": [
+      [
+        "calabaza",
+        200
+      ],
+      [
+        "zanahoria",
+        100
+      ],
+      [
+        "curcuma",
+        2
+      ],
+      [
+        "aceiteCoco",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Tortilla francesa con canónigos",
+    "t": "cena",
+    "fase": "base",
+    "ing": [
+      [
+        "huevo",
+        120
+      ],
+      [
+        "canonigos",
+        40
+      ],
+      [
+        "oliva",
+        8
+      ]
+    ]
+  },
+  {
+    "n": "Manzana asada con canela y coco",
+    "t": "snack",
+    "fase": 0,
+    "ing": [
+      [
+        "manzana",
+        150
+      ],
+      [
+        "canela",
+        2
+      ],
+      [
+        "coco",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Compota de pera con jengibre",
+    "t": "snack",
+    "fase": 0,
+    "ing": [
+      [
+        "pera",
+        150
+      ],
+      [
+        "jengibre",
+        3
+      ]
+    ]
+  },
+  {
+    "n": "Ensalada de canónigos, zanahoria y palta",
+    "t": "comida",
+    "fase": 1,
+    "ing": [
+      [
+        "canonigos",
+        60
+      ],
+      [
+        "zanahoria",
+        80
+      ],
+      [
+        "palta",
+        70
+      ],
+      [
+        "limon",
+        20
+      ],
+      [
+        "oliva",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Brócoli al vapor con oliva y limón",
+    "t": "comida",
+    "fase": 2,
+    "ing": [
+      [
+        "brocoli",
+        200
+      ],
+      [
+        "oliva",
+        10
+      ],
+      [
+        "limon",
+        15
+      ]
+    ]
+  },
+  {
+    "n": "Coliflor asada con cúrcuma",
+    "t": "comida",
+    "fase": 2,
+    "ing": [
+      [
+        "coliflor",
+        200
+      ],
+      [
+        "curcuma",
+        2
+      ],
+      [
+        "oliva",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Quinoa con verduras asadas",
+    "t": "comida",
+    "fase": 3,
+    "ing": [
+      [
+        "quinoa",
+        150
+      ],
+      [
+        "calabacin",
+        80
+      ],
+      [
+        "pimiento",
+        80
+      ],
+      [
+        "oliva",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Ensalada tibia de quinoa y pollo",
+    "t": "comida",
+    "fase": 3,
+    "ing": [
+      [
+        "quinoa",
+        120
+      ],
+      [
+        "pollo",
+        100
+      ],
+      [
+        "espinaca",
+        50
+      ],
+      [
+        "oliva",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Panqueques de trigo sarraceno con arándanos",
+    "t": "desayuno",
+    "fase": 4,
+    "ing": [
+      [
+        "sarraceno",
+        100
+      ],
+      [
+        "huevo",
+        60
+      ],
+      [
+        "arandanos",
+        60
+      ]
+    ]
+  },
+  {
+    "n": "Porridge de avena con frutos rojos",
+    "t": "desayuno",
+    "fase": 5,
+    "ing": [
+      [
+        "avenaSG",
+        40
+      ],
+      [
+        "arandanos",
+        60
+      ],
+      [
+        "canela",
+        2
+      ],
+      [
+        "coco",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Guiso de lentejas con calabaza y zanahoria",
+    "t": "comida",
+    "fase": 6,
+    "ing": [
+      [
+        "lentejas",
+        200
+      ],
+      [
+        "calabaza",
+        100
+      ],
+      [
+        "zanahoria",
+        80
+      ],
+      [
+        "oliva",
+        10
+      ]
+    ]
+  },
+  {
+    "n": "Chucrut junto a la comida principal",
+    "t": "snack",
+    "fase": 7,
+    "ing": [
+      [
+        "chucrut",
+        30
+      ]
+    ]
+  },
+  {
+    "n": "Queso de cabra curado, porción chica",
+    "t": "snack",
+    "fase": 8,
+    "ing": [
+      [
+        "quesoCabra",
+        30
+      ]
+    ]
+  },
+  {
+    "n": "Tostada de espelta masa madre con palta",
+    "t": "desayuno",
+    "fase": 9,
+    "ing": [
+      [
+        "panEspelta",
+        50
+      ],
+      [
+        "palta",
+        50
+      ]
+    ]
+  },
+  {
+    "n": "Escalera láctea: queso duro → yogur → leche",
+    "t": "snack",
+    "fase": 10,
+    "ing": [
+      [
+        "quesoVaca",
+        30
+      ],
+      [
+        "yogur",
+        125
+      ],
+      [
+        "leche",
+        100
+      ]
+    ],
+    "nota": "un lácteo por vez, en ese orden y en días distintos"
+  }
+]

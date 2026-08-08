@@ -1,0 +1,68 @@
+[
+  {
+    "n": "Frutas nuevas",
+    "e": "🍎",
+    "tip": "Fibra soluble: manzana o pera cocida/asada, frutas con algo más de fructosa.",
+    "i": 0
+  },
+  {
+    "n": "Verduras crudas y hojas verdes",
+    "e": "🥗",
+    "tip": "Incorporar de manera paulatina. Incluye alcaucil cocido.",
+    "i": 1
+  },
+  {
+    "n": "Crucíferas",
+    "e": "🥦",
+    "tip": "Brócoli, coliflor… bien cocidas al principio.",
+    "i": 2
+  },
+  {
+    "n": "Quinoa",
+    "e": "🌾",
+    "tip": "Pseudocereal sin gluten. Poca cantidad y bien cocida.",
+    "i": 3
+  },
+  {
+    "n": "Trigo sarraceno",
+    "e": "🥞",
+    "tip": "Pseudocereal sin gluten. Poca cantidad y bien cocido.",
+    "i": 4
+  },
+  {
+    "n": "Avena sin gluten",
+    "e": "🥣",
+    "tip": "Certificada sin gluten.",
+    "i": 5
+  },
+  {
+    "n": "Lentejas",
+    "e": "🫘",
+    "tip": "Remojadas y muy bien cocidas para reducir antinutrientes.",
+    "i": 6
+  },
+  {
+    "n": "Fermentados",
+    "e": "🫙",
+    "tip": "Chucrut/kimchi en cantidades chicas.",
+    "i": 7
+  },
+  {
+    "n": "Lácteos de cabra/oveja",
+    "e": "🐐",
+    "tip": "Empezar por quesos duros/curados.",
+    "i": 8
+  },
+  {
+    "n": "Gluten",
+    "e": "🍞",
+    "tip": "Espelta / masa madre. Solo si estás asintomática.",
+    "i": 9
+  },
+  {
+    "n": "Lácteos de vaca",
+    "e": "🥛",
+    "tip": "Queso duro → yogur/kéfir → leche. Solo si estás asintomática.",
+    "i": 10
+  }
+]

@@ -1,0 +1,9 @@
+[
+  { "id": "proteinas", "n": "Proteínas", "e": "🐟" },
+  { "id": "grasas", "n": "Grasas saludables", "e": "🥑" },
+  { "id": "vegetales", "n": "Vegetales", "e": "🥕" },
+  { "id": "tuberculos", "n": "Tubérculos y arroz", "e": "🍚" },
+  { "id": "frutas", "n": "Frutas", "e": "🫐" },
+  { "id": "otros", "n": "Otros y especias", "e": "🍄" },
+  { "id": "reintro", "n": "Reintroducción", "e": "🔄" }
+]
