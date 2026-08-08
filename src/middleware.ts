@@ -9,7 +9,7 @@ export function middleware(request: NextRequest) {
   if (PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
     return NextResponse.next();
   }
-  const hasSession = request.cookies.has("protocolo_session");
+  const hasSession = request.cookies.has("recipi_session");
   if (!hasSession) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";

@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from 'next';
 import { getSessionUser } from '@/lib/auth';
+import Logo from '@/components/Logo';
 import NavMenu from '@/components/NavMenu';
 import PWA from '@/components/PWA';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Protocolo',
+  title: 'Recipi',
   description: 'Planes de alimentación por fases',
   manifest: '/manifest.webmanifest',
   icons: { apple: '/iconos/apple-touch-icon.png' },
@@ -26,11 +27,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-screen">
         <header className="no-print sticky top-0 z-50 border-b border-linea bg-crema/95 backdrop-blur">
           <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-4 py-2.5">
-            <a href="/" className="leading-tight">
-              <span className="font-display text-lg font-semibold">Protocolo</span>
-              <small className="brand-spaced block text-[10.5px] font-bold text-salvia-osc">
-                plan por fases
-              </small>
+            <a href="/" className="flex items-center gap-2.5">
+              <Logo size={30} className="shrink-0" />
+              <span className="leading-tight">
+                <span className="font-display text-lg font-semibold">Recipi</span>
+                <small className="brand-spaced block text-[10.5px] font-bold text-salvia-osc">
+                  plan por fases
+                </small>
+              </span>
             </a>
             {user && <NavMenu userName={user.name} />}
           </div>

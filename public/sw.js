@@ -1,11 +1,11 @@
-// Service worker de Protocolo.
+// Service worker de Recipi.
 // Estrategia v1 (solo lectura offline del plan activo):
 // - Assets estáticos (_next/static, iconos, uploads): cache-first.
 // - Navegaciones y GET de API: network-first con fallback a la última copia
 //   cacheada — al volver a abrir sin conexión se ve la última sincronización.
 // - Escrituras (POST/PATCH/DELETE) nunca se cachean ni se encolan (v1).
 
-const VERSION = 'protocolo-v1';
+const VERSION = 'recipi-v1';
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGES_CACHE = `${VERSION}-pages`;
 

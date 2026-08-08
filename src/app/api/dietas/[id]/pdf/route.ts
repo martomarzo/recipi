@@ -34,7 +34,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': 'attachment; filename="protocolo-resumen.pdf"',
+        'Content-Disposition': 'attachment; filename="recipi-resumen.pdf"',
         'Content-Length': String(pdf.length),
       },
     });

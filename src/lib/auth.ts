@@ -3,7 +3,7 @@ import { randomBytes } from "crypto";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
-const SESSION_COOKIE = "protocolo_session";
+const SESSION_COOKIE = "recipi_session";
 const SESSION_DAYS = 30;
 
 export async function hashPassword(password: string) {

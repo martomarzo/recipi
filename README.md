@@ -1,4 +1,4 @@
-# Protocolo 🌿
+# Recipi 🌿
 
 App web self-hosted para seguir **planes de alimentación por fases** (protocolos de nutricionista). Tres secciones: **Dietas** (timeline por semanas con fases, reintroducciones y regla de los 4 días), **Recetas** (con macros calculados e importación desde un link) e **Ingredientes** (catálogo global con valores nutricionales por 100 g).
 

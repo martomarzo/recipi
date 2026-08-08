@@ -9,7 +9,7 @@ body {
 }
 
 @layer components {
-  /* Marca tipo "p r o t o c o l o" */
+  /* Marca tipo "r e c i p i" */
   .brand-spaced {
     letter-spacing: 0.22em;
     text-transform: uppercase;
