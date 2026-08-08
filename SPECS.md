@@ -307,6 +307,7 @@ El protocolo incluye dos rutinas de día (post-guardia / día normal) con horari
 - "A evitar" del seed: filas de `phase_ingredient_rules` con ambos FK null y el texto en `note` (markdown).
 - `dish_suggestions` con solo `diet_id` = "válido todo el plan"; `week_number` rinde chip "S{N}" y ordena primero en esa semana.
 - Recetas: `PATCH` es reemplazo completo (herencia de Recipi). Importación por link: JSON-LD de schema.org → parser Claude (`ANTHROPIC_API_KEY`) → parser regex; líneas sin mapear quedan en `parsed_json`.
+- Import con IA (08/08/2026): los ingredientes sin mapear se pueden crear en un clic con **macros estimados por Claude** (`POST /api/ingredientes/estimar`); reusa existentes por nombre normalizado y marca los nuevos con `notes` "Valores estimados con IA — revisar". Modelo económico `claude-haiku-4-5` (≈ USD 0,001 por import), sobreescribible con `ANTHROPIC_MODEL`; si el id configurado no existe (404), parser y estimador reintentan con el default (`src/lib/recetas/anthropicModel.ts`) en vez de fallar en silencio.
 - Imágenes subidas en `data/uploads` (servidas por route handler, no `public/`); `data/` concentra TODO lo persistente (SQLite, uploads, estado tailscale).
 - Extra heredado de Recipi (fuera de spec, requerido por Marto): importar recetas por link/texto + timers interactivos en los pasos.
 - A.6 (rutinas de biorritmo) no implementado.

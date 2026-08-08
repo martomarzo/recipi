@@ -1,27 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionUser } from '@/lib/auth';
-
-function slugify(input: string): string {
-  const base = input
-    .normalize('NFD')
-    .replace(new RegExp('[\\u0300-\\u036f]', 'g'), '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-+|-+$)/g, '');
-  return base || 'ingrediente';
-}
-
-async function uniqueKey(base: string): Promise<string> {
-  let key = base;
-  let n = 2;
-  // eslint-disable-next-line no-await-in-loop
-  while (await prisma.ingredient.findUnique({ where: { key } })) {
-    key = `${base}-${n}`;
-    n++;
-  }
-  return key;
-}
+import { slugify, uniqueIngredientKey } from '@/lib/ingredientKeys';
 
 function parseRequiredNumber(value: unknown): number | null {
   if (value === undefined || value === null || value === '') return null;
@@ -97,7 +77,7 @@ export async function POST(req: NextRequest) {
     fiber = f;
   }
 
-  const key = await uniqueKey(slugify(name));
+  const key = await uniqueIngredientKey(slugify(name));
 
   const ingredient = await prisma.ingredient.create({
     data: {

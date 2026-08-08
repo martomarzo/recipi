@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { createWithConfiguredModel } from "./anthropicModel";
 import type { ParsedRecipe } from "./types";
 
 const SYSTEM_PROMPT = `Sos un extractor de recetas de cocina. A partir de un texto crudo (posiblemente en español o inglés), devolvé únicamente un objeto JSON con esta forma exacta (sin markdown, sin texto extra):
@@ -21,10 +22,8 @@ Reglas:
 
 export async function parseWithClaude(rawText: string): Promise<ParsedRecipe> {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const model = process.env.ANTHROPIC_MODEL || "claude-haiku-4-5";
 
-  const response = await client.messages.create({
-    model,
+  const response = await createWithConfiguredModel(client, {
     max_tokens: 4096,
     system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
     messages: [{ role: "user", content: `Extraé la receta de este texto:\n\n${rawText}` }],

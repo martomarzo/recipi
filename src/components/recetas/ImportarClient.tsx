@@ -50,6 +50,8 @@ export default function ImportarClient() {
   const [newIngFor, setNewIngFor] = useState<number | null>(null);
 
   const [submitting, setSubmitting] = useState(false);
+  const [estimando, setEstimando] = useState(false);
+  const [estimadoMsg, setEstimadoMsg] = useState<string | null>(null);
 
   async function analizar() {
     setError(null);
@@ -99,6 +101,50 @@ export default function ImportarClient() {
 
   function updateLine(idx: number, patch: Partial<LineState>) {
     setLines((prev) => prev.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
+  }
+
+  // Crea de una vez todos los ingredientes sin mapear, con macros estimados
+  // por IA (POST /api/ingredientes/estimar), y mapea las líneas al resultado.
+  async function crearFaltantes() {
+    const pares = lines
+      .map((l, idx) => ({ idx, nombre: (l.line.name || l.line.raw).trim() }))
+      .filter((p) => lines[p.idx].selectedId === '' && p.nombre);
+    if (pares.length === 0) return;
+
+    setEstimando(true);
+    setError(null);
+    setEstimadoMsg(null);
+    try {
+      const res = await fetch('/api/ingredientes/estimar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ names: pares.map((p) => p.nombre) }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'No se pudo estimar con IA.');
+
+      const items: { input: string; created: boolean; ingredient: IngredientLite }[] =
+        Array.isArray(data.items) ? data.items : [];
+      for (const p of pares) {
+        const item = items.find((it) => it.input === p.nombre);
+        if (!item?.ingredient) continue;
+        updateLine(p.idx, {
+          selectedId: item.ingredient.id,
+          matches: [item.ingredient, ...lines[p.idx].matches],
+        });
+      }
+      const creados = items.filter((it) => it.created).length;
+      const reusados = items.length - creados;
+      setEstimadoMsg(
+        `${creados} ingrediente${creados === 1 ? '' : 's'} creado${creados === 1 ? '' : 's'} con macros estimados` +
+          (reusados > 0 ? ` (${reusados} ya existía${reusados === 1 ? '' : 'n'})` : '') +
+          ' — los valores son aproximados, revisalos en Ingredientes.'
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo estimar con IA.');
+    } finally {
+      setEstimando(false);
+    }
   }
 
   async function guardar() {
@@ -245,6 +291,19 @@ export default function ImportarClient() {
           Mapeá cada línea a un ingrediente del catálogo y confirmá los gramos, o creá el ingrediente si no existe.
           Las líneas sin mapear no se pierden: quedan guardadas junto a la receta.
         </p>
+        {lines.some((l) => l.selectedId === '') && (
+          <div className="mb-3">
+            <button
+              type="button"
+              onClick={crearFaltantes}
+              disabled={estimando}
+              className="btn disabled:opacity-60"
+            >
+              {estimando ? 'Estimando macros…' : '✨ Crear faltantes con macros estimados (IA)'}
+            </button>
+          </div>
+        )}
+        {estimadoMsg && <p className="mb-3 text-xs font-semibold text-salvia-osc">{estimadoMsg}</p>}
         <div className="space-y-2">
           {lines.map((l, idx) => (
             <div key={idx} className="card p-3">
