@@ -162,7 +162,7 @@ Tercera sub-vista de una dieta, junto a Timeline y Vista general (**prototipada 
 ### 9.1 Entorno de despliegue inicial (infra propia)
 
 - **Host**: servidor local — VM en Proxmox que corre Docker.
-- **Acceso**: `ssh roo@containers`.
+- **Acceso**: `ssh root@containers` (Tailscale SSH; la ACL usa check mode — puede pedir re-autenticación en el navegador).
 - **Layout en el servidor**: una carpeta dedicada para la app (p. ej. `~/recipi/`) que contiene el código (clone de `https://github.com/martomarzo/recipi.git`) y, dentro, el volumen de datos `./data/` (SQLite `app.db` + `uploads/`). Backup = copiar la carpeta `data/`.
 - **Flujo de deploy**: `git pull` + `docker compose up -d --build` dentro de esa carpeta; el seed se corre una sola vez con `docker compose exec app npm run seed` (o equivalente).
 - **HTTPS**: dentro de la LAN puede ir en HTTP; si se expone hacia afuera, detrás de un reverse proxy con TLS (ver §2).

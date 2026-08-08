@@ -1,0 +1,8 @@
+[Unit]
+Description=Recipi/Protocolo auto-deploy (pull + rebuild si hay commits nuevos)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/root/recipi/deploy/deploy.sh

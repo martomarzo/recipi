@@ -1,129 +1,80 @@
-# Recipi 🍳
+# Protocolo 🌿
 
-A self-hosted personal recipe collection. Its standout feature is **paste-to-parse**: paste raw recipe text from anywhere (a website, a note, a photo transcription) and Recipi turns it into structured ingredients and step-by-step instructions — with **interactive cooking timers** automatically detected in each step.
+App web self-hosted para seguir **planes de alimentación por fases** (protocolos de nutricionista). Tres secciones: **Dietas** (timeline por semanas con fases, reintroducciones y regla de los 4 días), **Recetas** (con macros calculados e importación desde un link) e **Ingredientes** (catálogo global con valores nutricionales por 100 g).
 
-## Features
+Especificación completa en [SPECS.md](SPECS.md). El diseño replica `prototype.html`.
 
-- **Paste-to-parse** — paste any recipe text and get structured ingredients + steps.
-- **AI parsing with graceful fallback** — uses the Claude API when configured; falls back to a built-in regex parser when no API key is set or the API call fails.
-- **Interactive timers** — time phrases like "bake for 30 minutes" are detected per step and rendered as start/pause/reset countdown widgets.
-- **Image uploads** — attach a photo to each recipe (validated, 10 MB limit, persisted in a Docker volume).
-- **Star ratings** — rate recipes 1–5; averages shown on cards and detail pages.
-- **Edit & re-parse** — update any recipe, with the option to re-parse the original text.
+## Funcionalidad
 
-## Tech Stack
+- **Timeline por semanas**: fases coloreadas, marcador de "hoy", detalle de cada semana (permitidos, a evitar, en prueba, recetas sugeridas). Cambiar la fecha de inicio recalcula todo el plan al instante.
+- **Reintroducción**: bloques de 4 días con estado (pendiente / en prueba / tolerado / con síntomas), reencolar al final si hay síntomas — las fechas siguientes se recalculan solas.
+- **Disponibilidad (Gantt)**: cada ingrediente día a día — base segura, en prueba, disponible o cortado por síntomas.
+- **Recetas**: constructor con ingredientes en gramos y totales nutricionales en vivo; **importar desde un link** (scrapea la página: JSON-LD de schema.org → parser con Claude → parser regex de respaldo) o pegando texto; timers interactivos en los pasos; sugerencias por fase/bloque/semana.
+- **Ingredientes**: catálogo global con foto (o emoji), búsqueda y filtros; archivado si está en uso.
+- **Vista general + PDF**: resumen compacto de todo el plan (1–2 A4), export a PDF server-side e impresión.
+- **Multi-usuario**: email + contraseña, registro abierto o por invitación (`REGISTRATION_OPEN`).
+- **PWA**: instalable, lectura offline del último plan sincronizado.
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 14 (App Router, React 18, standalone output) |
-| Language | TypeScript 5 (strict mode) |
-| Styling | Tailwind CSS 3 (warm amber theme) |
-| Database | PostgreSQL via Prisma 5 |
-| AI | `@anthropic-ai/sdk` (Claude API, optional) |
-| Deployment | Docker (multi-stage build); external Postgres |
+## Stack
 
-## Getting Started
+Next.js 14 (App Router) · TypeScript · Tailwind · Prisma 5 · **SQLite** (un archivo, backup trivial) · Docker Compose · sidecar de Tailscale opcional.
 
-### Prerequisites
-
-- Node.js 20+
-- A PostgreSQL database
-- (Optional) An [Anthropic API key](https://console.anthropic.com/) for AI-powered parsing
-
-### Local development
+## Desarrollo local
 
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Configure environment
-cp .env.example .env
-# edit .env with your DATABASE_URL (and optionally ANTHROPIC_API_KEY)
-
-# 3. Run database migrations
-npm run db:migrate
-
-# 4. Start the dev server
-npm run dev
+cp .env.example .env        # revisar valores
+npx prisma migrate dev      # crea data/app.db
+npm run seed                # catálogo + plan demo "Protocolo Intestinal"
+npm run dev                 # http://localhost:3000
 ```
 
-The app runs at [http://localhost:3000](http://localhost:3000).
+El seed crea (si no hay usuarios) `demo@protocolo.local` / `protocolo123`.
 
-## Environment Variables
+## Variables de entorno
 
-| Variable | Required | Description |
-|---|---|---|
-| `DATABASE_URL` | Yes | PostgreSQL connection string. |
-| `NEXT_PUBLIC_BASE_URL` | Yes | Base URL the server uses for its own internal API fetches. **Must match the deployed host** (e.g. `http://192.168.1.x:3000`) or server-rendered pages will 500. |
-| `ANTHROPIC_API_KEY` | No | Enables AI parsing. Without it, the regex fallback parser is used. |
-| `ANTHROPIC_MODEL` | No | Claude model for parsing. Defaults to `claude-haiku-4-5`. Options: `claude-haiku-4-5` (fast/cheap), `claude-sonnet-4-6` (balanced), `claude-opus-4-7` (best). |
-
-## NPM Scripts
-
-| Script | Description |
+| Variable | Descripción |
 |---|---|
-| `npm run dev` | Start the development server. |
-| `npm run build` | Generate the Prisma client and build for production. |
-| `npm run start` | Start the production server. |
-| `npm run lint` | Run Next.js lint. |
-| `npm run db:migrate` | Create/apply a migration (development). |
-| `npm run db:deploy` | Apply migrations (`prisma migrate deploy`, for production). |
-| `npm run db:studio` | Open Prisma Studio. |
+| `DATABASE_URL` | SQLite. Local: `file:../data/app.db` · Docker: `file:/data/app.db`. |
+| `SECRET_KEY` | Clave para producción (generar una aleatoria). |
+| `REGISTRATION_OPEN` | `true` = registro abierto; `false` = solo con link de invitación. |
+| `ANTHROPIC_API_KEY` | Opcional — mejora el parseo de recetas importadas (sin clave: parser regex). |
+| `ANTHROPIC_MODEL` | Opcional — modelo para el parseo (default `claude-haiku-4-5`). |
+| `TS_AUTHKEY` | Opcional — auth key de Tailscale para el sidecar (solo el primer arranque). |
+| `COOKIE_SECURE` | Poner `false` solo si se entra por HTTP plano (LAN sin TLS). |
 
-## Deployment (Docker)
-
-Recipi ships as a single-container app that connects to an **external** Postgres database (none is bundled).
+## Deploy (Docker)
 
 ```bash
-# 1. Configure .env (set NEXT_PUBLIC_BASE_URL to the host's real IP/hostname)
-# 2. Apply migrations against the production DB
-npm run db:deploy
-# 3. Build and start
+# En el servidor (VM Proxmox con Docker — ssh al host, ver SPECS §9.1):
+git clone https://github.com/martomarzo/recipi.git && cd recipi
+cp .env.example .env        # completar SECRET_KEY, REGISTRATION_OPEN, TS_AUTHKEY…
 docker compose up -d --build
+docker compose exec app node prisma/seed.mjs   # una sola vez
 ```
 
-- Image uploads are stored in `public/uploads/`, persisted via a named Docker volume (`uploads`) so they survive container restarts.
-- The container runs as a non-root `nextjs` user.
-- If the Prisma client seems stale, rebuild with `docker compose build --no-cache`.
+- Todo lo persistente vive en **`./data/`**: `app.db` (SQLite), `uploads/` (fotos), `tailscale/` (estado del sidecar). Las migraciones corren solas al arrancar.
+- **Acceso**: `https://recipi.<tailnet>.ts.net` vía el sidecar de Tailscale (`tailscale serve`, config en `tailscale/serve.json`), o `http://IP:3000` en la LAN (en ese caso `COOKIE_SECURE=false`).
+- El PDF usa el chromium incluido en la imagen.
 
-## Project Structure
+## Backup y restore
 
-```
-src/
-├── app/
-│   ├── api/
-│   │   ├── parse/route.ts          # Parse raw text → structured recipe (Claude or fallback)
-│   │   ├── recipes/route.ts        # List / create recipes
-│   │   ├── recipes/[id]/route.ts   # Get / update / delete a recipe
-│   │   ├── ratings/route.ts        # Submit a star rating
-│   │   └── upload/route.ts         # Image upload
-│   ├── recipes/
-│   │   ├── new/page.tsx            # Add recipe
-│   │   ├── [id]/page.tsx           # Recipe detail
-│   │   └── [id]/edit/page.tsx      # Edit recipe
-│   ├── page.tsx                    # Home (recipe grid)
-│   ├── layout.tsx                  # App shell + header
-│   └── icon.tsx                    # Favicon (Next.js ImageResponse)
-├── components/                     # RecipeForm, RecipeCard, StepTimer, StarRating, etc.
-├── hooks/useTimer.ts               # useReducer-based countdown timer
-├── lib/
-│   ├── claudeParser.ts             # Claude API parsing (with prompt caching)
-│   ├── parser.ts                   # Regex fallback parser
-│   ├── timeParser.ts               # Extracts timer durations from step text
-│   └── prisma.ts                   # Prisma client singleton
-└── types/recipe.ts                 # Shared TypeScript types
-prisma/schema.prisma                # Recipe, Ingredient, Step, Rating models
+```bash
+# Backup: copiar la carpeta data/ (idealmente con la app parada o con sqlite3 .backup)
+tar czf backup-$(date +%F).tgz data/
+
+# Restore: descomprimir y levantar
+tar xzf backup-2026-08-08.tgz && docker compose up -d
 ```
 
-## How Parsing Works
+## Scripts
 
-1. The client sends raw text to `POST /api/parse`.
-2. If `ANTHROPIC_API_KEY` is set, the text is sent to Claude with a system prompt that returns structured JSON (and keeps timing phrases inside step text so timers can be detected later). On any failure, it falls back automatically.
-3. The fallback `parser.ts` uses section-heading detection and regex (handling unicode fractions like ½, ¾) to extract ingredients and steps.
-4. The response includes an `aiParsed` flag indicating which path was used.
-5. On the recipe detail page, `timeParser.ts` scans each step for time phrases and renders an interactive countdown timer where found.
+| Script | Descripción |
+|---|---|
+| `npm run dev` / `build` / `start` | Next.js. |
+| `npm run seed` | Seed idempotente (catálogo + plan demo, Apéndice A de SPECS). |
+| `npm run db:migrate` / `db:deploy` / `db:studio` | Prisma. |
 
-## Notes
-
-- **Single-user** — there is no authentication; Recipi is designed as a private, personal collection.
-- **Edits are destructive replaces** — updating a recipe deletes and recreates its ingredients and steps (positions reset), so their database IDs are not stable across edits. The original pasted text (`rawText`) is always retained for re-parsing.
+# Auto-deploy
+El servidor corre `deploy/recipi-deploy.timer` (systemd): cada 2 minutos chequea `origin/main` y, si hay commits nuevos, hace `git reset --hard` + `docker compose up -d --build`. Deployar = pushear a `main`.
+Logs: `journalctl -u recipi-deploy.service -n 50`.

@@ -1,0 +1,9 @@
+[Unit]
+Description=Chequea cada 2 minutos si hay commits nuevos para deployar
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=2min
+
+[Install]
+WantedBy=timers.target
