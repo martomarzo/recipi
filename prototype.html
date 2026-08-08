@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Plan — Dietas, recetas e ingredientes</title>
+<style>
+  :root{
+    --crema:#FAF7F2; --tinta:#2E332E; --tinta-suave:#6B6F68;
+    --salvia:#7D9B76; --salvia-osc:#3F5741; --salvia-bg:#EEF3EC;
+    --azul:#6B8CAE; --azul-bg:#EBF1F7;
+    --terra:#C68A4F; --terra-osc:#8F5F2E; --terra-bg:#F8EFE4;
+    --neutro:#A39E93; --neutro-bg:#F0EEE9;
+    --linea:#E8E2D8; --blanco:#FFFFFF;
+    --ok:#5F8D5F; --mal:#B85C48;
+    --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--crema);color:var(--tinta);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased}
+
+  /* ---------- App bar / menú general ---------- */
+  .appbar{position:sticky;top:0;z-index:50;background:rgba(250,247,242,.94);backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--linea);display:flex;align-items:center;gap:10px;
+    padding:10px 16px;flex-wrap:wrap;justify-content:space-between}
+  .brand{font-family:Georgia,serif;font-size:19px;font-weight:600;letter-spacing:.02em;cursor:pointer}
+  .brand small{display:block;font-family:system-ui,sans-serif;font-size:10.5px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--salvia-osc);font-weight:700}
+  .menu{display:flex;gap:8px}
+  .menu button{border:1px solid var(--linea);background:var(--blanco);color:var(--tinta);
+    padding:9px 16px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;min-height:44px}
+  .menu button.activo{background:var(--tinta);color:var(--crema);border-color:var(--tinta)}
+  .menu button:hover:not(.activo){border-color:var(--tinta-suave)}
+
+  main{max-width:1080px;margin:0 auto;padding:24px 16px 80px}
+  section.vista{display:none}
+  section.vista.visible{display:block}
+  .vista-head{text-align:center;margin-bottom:22px}
+  .vista-head h2{font-family:Georgia,serif;font-size:clamp(24px,4vw,32px);font-weight:600}
+  .vista-head p{color:var(--tinta-suave);font-size:14px;max-width:560px;margin:4px auto 0}
+
+  /* ---------- Vista: Dietas (lista) ---------- */
+  .dietas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .dieta-card{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--radius);
+    padding:20px;cursor:pointer;transition:box-shadow .15s,transform .15s}
+  .dieta-card:hover{box-shadow:0 6px 20px rgba(46,51,46,.10);transform:translateY(-2px)}
+  .dieta-card h3{font-family:Georgia,serif;font-size:21px;font-weight:600}
+  .dieta-card .meta{font-size:13px;color:var(--tinta-suave);margin:2px 0 12px}
+  .dieta-card .chip-activa{display:inline-block;background:var(--salvia-bg);color:var(--salvia-osc);
+    border:1px solid var(--salvia);font-size:11px;font-weight:800;letter-spacing:.07em;
+    text-transform:uppercase;border-radius:999px;padding:3px 10px;margin-bottom:10px}
+  .mini-banda{display:flex;gap:2px;height:10px;border-radius:6px;overflow:hidden;margin:10px 0 6px}
+  .mini-banda i{flex:1}
+  .dieta-card .abrir{color:var(--terra-osc);font-weight:700;font-size:13.5px}
+  .dieta-card.nueva{border-style:dashed;background:transparent;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;color:var(--tinta-suave);min-height:170px}
+  .dieta-card.nueva .mas{font-size:34px;line-height:1;color:var(--salvia)}
+  .dieta-card.nueva p{font-size:13px;max-width:230px}
+
+  /* ---------- Vista: dieta / timeline ---------- */
+  .dieta-hero{text-align:center;margin-bottom:14px}
+  .volver{background:none;border:none;color:var(--tinta-suave);font-size:13.5px;font-weight:600;
+    cursor:pointer;padding:6px 0;display:inline-flex;gap:6px;align-items:center}
+  .volver:hover{color:var(--tinta)}
+  .eyebrow{font-family:Georgia,serif;letter-spacing:.4em;text-transform:lowercase;font-size:12px;
+    color:var(--salvia-osc);font-weight:600;white-space:nowrap}
+  @media(max-width:480px){.eyebrow{letter-spacing:.22em;font-size:10.5px}}
+  .dieta-hero h1{font-family:Georgia,serif;font-weight:500;font-size:clamp(26px,5vw,36px);margin:4px 0 2px}
+  .dieta-hero .sub{color:var(--tinta-suave);font-size:14px}
+  .fecha-editor{display:inline-flex;align-items:center;gap:8px;margin-top:10px;background:var(--blanco);
+    border:1px solid var(--linea);border-radius:999px;padding:7px 16px;font-size:13.5px}
+  .fecha-editor label{font-weight:700}
+  .fecha-editor input{border:none;background:transparent;font:inherit;color:var(--terra-osc);
+    font-weight:700;cursor:pointer;outline:none}
+  .hoy-banner{max-width:680px;margin:14px auto 0;background:var(--blanco);border:1px solid var(--linea);
+    border-radius:var(--radius);padding:12px 18px;display:flex;gap:12px;align-items:center;justify-content:center;
+    flex-wrap:wrap;cursor:pointer;transition:box-shadow .15s}
+  .hoy-banner:hover{box-shadow:0 3px 14px rgba(46,51,46,.08)}
+  .hoy-dot{width:10px;height:10px;border-radius:50%;flex:none}
+  .hoy-banner b{font-weight:650}
+  .hoy-banner .ver{color:var(--terra-osc);font-size:13px;font-weight:600}
+  .subnav{display:flex;gap:8px;justify-content:center;margin:16px 0 22px;flex-wrap:wrap}
+  .subnav button{border:1px solid var(--linea);background:var(--blanco);color:var(--tinta);
+    padding:8px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;min-height:42px}
+  .subnav button.activo{background:var(--salvia-osc);color:var(--crema);border-color:var(--salvia-osc)}
+
+  .leyenda{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:14px;font-size:13px;color:var(--tinta-suave)}
+  .leyenda span{display:flex;align-items:center;gap:6px}
+  .leyenda i{width:12px;height:12px;border-radius:4px;display:inline-block}
+  .banda-wrap{position:relative;margin:0 4px 30px}
+  .banda{display:flex;gap:3px;height:38px}
+  .banda .seg{flex:1;border-radius:8px;position:relative;cursor:pointer;opacity:.9;transition:opacity .15s,transform .15s}
+  .banda .seg:hover{opacity:1;transform:translateY(-2px)}
+  .banda .seg small{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:5px;
+    font-size:11px;color:var(--tinta-suave);white-space:nowrap}
+  .marcador-hoy{position:absolute;top:-12px;bottom:-6px;width:2px;background:var(--tinta);z-index:5;pointer-events:none}
+  .marcador-hoy::after{content:"HOY";position:absolute;top:-16px;left:50%;transform:translateX(-50%);
+    background:var(--tinta);color:var(--crema);font-size:10px;font-weight:700;letter-spacing:.08em;
+    padding:2px 8px;border-radius:999px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-top:34px}
+  .card{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--radius);
+    padding:16px 18px;cursor:pointer;transition:box-shadow .15s,transform .15s;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--pc,var(--salvia))}
+  .card:hover{box-shadow:0 6px 20px rgba(46,51,46,.10);transform:translateY(-2px)}
+  .card.actual{outline:2px solid var(--tinta);outline-offset:2px}
+  .card .fila1{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .card h3{font-family:Georgia,serif;font-size:20px;font-weight:600}
+  .card .fechas{font-size:13px;color:var(--tinta-suave);white-space:nowrap}
+  .chip{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:3px 10px;border-radius:999px;margin:8px 0 10px;color:#fff;background:var(--pc,var(--salvia))}
+  .card ul{list-style:none;font-size:13.5px;display:grid;gap:5px}
+  .card ul li{display:flex;gap:7px;align-items:flex-start}
+  .card .mini-tag{font-size:12px;color:var(--tinta-suave)}
+
+  /* ---------- Modal detalle semana ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(46,51,46,.45);z-index:100;display:none;
+    align-items:flex-end;justify-content:center}
+  .overlay.abierto{display:flex}
+  .detalle{background:var(--crema);width:100%;max-width:720px;max-height:92vh;overflow-y:auto;
+    border-radius:22px 22px 0 0;padding:22px 22px 40px;animation:sube .22s ease-out}
+  @media(min-width:700px){.overlay{align-items:center;padding:24px}.detalle{border-radius:22px;max-height:88vh}}
+  @keyframes sube{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
+  .detalle .cerrar{position:sticky;top:0;float:right;background:var(--blanco);
+    border:1px solid var(--linea);width:40px;height:40px;border-radius:50%;font-size:17px;cursor:pointer;z-index:2}
+  .detalle h2{font-family:Georgia,serif;font-size:28px;font-weight:600;margin:4px 0 2px}
+  .detalle .sub{color:var(--tinta-suave);font-size:14px;margin-bottom:14px}
+  .detalle h4{font-size:12.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--tinta-suave);margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+  .detalle h4::after{content:"";flex:1;height:1px;background:var(--linea)}
+  .bloque-prueba{background:var(--blanco);border:1px solid var(--linea);border-left:5px solid var(--terra);
+    border-radius:12px;padding:14px 16px;margin-bottom:10px}
+  .bloque-prueba .bp-top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+  .bloque-prueba b{font-size:16px}
+  .bloque-prueba .rango{font-size:13px;color:var(--terra-osc);font-weight:700;white-space:nowrap}
+  .bloque-prueba p{font-size:13.5px;color:var(--tinta-suave);margin-top:6px}
+  .estado-botones{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .estado-botones button{border:1.5px solid var(--linea);background:var(--crema);border-radius:999px;
+    padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;min-height:38px}
+  .estado-botones button.sel-ok{background:var(--ok);border-color:var(--ok);color:#fff}
+  .estado-botones button.sel-mal{background:var(--mal);border-color:var(--mal);color:#fff}
+  .grupo{margin-bottom:12px}
+  .grupo .gtit{font-size:13.5px;font-weight:700;margin-bottom:6px}
+  .pills{display:flex;flex-wrap:wrap;gap:6px}
+  .pill{background:var(--blanco);border:1px solid var(--linea);border-radius:999px;padding:4px 12px;font-size:13px}
+  .pill.reintro{background:var(--salvia-bg);border-color:var(--salvia);color:var(--salvia-osc);font-weight:600}
+  details.evitar{background:var(--neutro-bg);border:1px solid var(--linea);border-radius:12px;
+    padding:12px 16px;margin-top:6px}
+  details.evitar summary{cursor:pointer;font-weight:700;font-size:14px}
+  details.evitar ul{margin:10px 0 0 18px;font-size:13.5px;color:var(--tinta-suave);display:grid;gap:4px}
+  .reglas{background:var(--salvia-bg);border:1px solid var(--linea);border-radius:12px;padding:13px 16px}
+  .reglas ul{margin-left:18px;font-size:13.5px;display:grid;gap:5px}
+
+  /* ---------- Recetas ---------- */
+  .filtros{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}
+  .filtros button{border:1px solid var(--linea);background:var(--blanco);border-radius:999px;
+    padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;min-height:40px}
+  .filtros button.activo{background:var(--terra);border-color:var(--terra);color:#fff}
+  .recetas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  .receta{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--radius);padding:16px 18px}
+  .receta .r-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+  .receta h3{font-size:16px;font-weight:700;line-height:1.3}
+  .receta .tipo{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--terra-osc);background:var(--terra-bg);border-radius:999px;padding:3px 9px;white-space:nowrap;flex:none}
+  .receta .fase-tag{font-size:11.5px;color:var(--tinta-suave);margin-top:2px}
+  .receta ul{list-style:none;margin:10px 0;font-size:13px;color:var(--tinta-suave);display:grid;gap:3px}
+  .receta ul li{display:flex;justify-content:space-between;gap:10px}
+  .receta ul li i{font-style:normal}
+  .macros{display:flex;gap:6px;flex-wrap:wrap;border-top:1px dashed var(--linea);padding-top:10px}
+  .macros span{font-size:12px;font-weight:700;background:var(--crema);border:1px solid var(--linea);
+    border-radius:999px;padding:3px 10px}
+  .macros .kcal{background:var(--tinta);color:var(--crema);border-color:var(--tinta)}
+
+  /* ---------- Ingredientes ---------- */
+  .buscador{display:flex;justify-content:center;margin-bottom:14px}
+  .buscador input{width:min(420px,100%);border:1px solid var(--linea);border-radius:999px;
+    padding:11px 20px;font-size:14.5px;background:var(--blanco);outline:none}
+  .buscador input:focus{border-color:var(--salvia)}
+  .ing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+  .ing-tile{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--radius);
+    padding:14px 12px;text-align:center}
+  .ing-tile .foto{width:64px;height:64px;border-radius:50%;background:var(--salvia-bg);
+    display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 8px}
+  .ing-tile[data-cat="reintro"] .foto{background:var(--terra-bg)}
+  .ing-tile b{font-size:13.5px;display:block;line-height:1.3}
+  .ing-tile .cat{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta-suave);font-weight:700}
+  .ing-tile .nut{font-size:11.5px;color:var(--tinta-suave);margin-top:6px;line-height:1.45}
+  .ing-tile .nut b{display:inline;font-size:11.5px}
+  .nota-imagen{text-align:center;font-size:12px;color:var(--tinta-suave);margin-top:18px}
+
+  /* ---------- Vista general ---------- */
+  .gen-head{text-align:center;margin-bottom:18px}
+  .gen-head h2{font-family:Georgia,serif;font-size:26px;font-weight:600}
+  .gen-head p{color:var(--tinta-suave);font-size:13.5px}
+  table.gen{width:100%;border-collapse:collapse;background:var(--blanco);border:1px solid var(--linea);
+    border-radius:var(--radius);overflow:hidden;font-size:13.5px}
+  table.gen th{background:var(--tinta);color:var(--crema);text-align:left;padding:9px 12px;
+    font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+  table.gen td{padding:9px 12px;border-top:1px solid var(--linea);vertical-align:top}
+  table.gen tr.f-exclusion td:first-child{box-shadow:inset 4px 0 0 var(--salvia)}
+  table.gen tr.f-probioticos td:first-child{box-shadow:inset 4px 0 0 var(--azul)}
+  table.gen tr.f-reintroduccion td:first-child{box-shadow:inset 4px 0 0 var(--terra)}
+  table.gen tr.f-mantenimiento td:first-child{box-shadow:inset 4px 0 0 var(--neutro)}
+  table.gen .fase-mini{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+  .gen-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  @media(max-width:640px){.gen-cols{grid-template-columns:1fr}}
+  .gen-box{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--radius);padding:16px 18px}
+  .gen-box h3{font-family:Georgia,serif;font-size:18px;margin-bottom:10px}
+  .gen-box p{font-size:13px;margin-bottom:7px}
+  .gen-reglas{margin-top:14px;font-size:12.5px;color:var(--tinta-suave);background:var(--blanco);
+    border:1px dashed var(--linea);border-radius:var(--radius);padding:12px 16px}
+
+  .nota-proto{max-width:680px;margin:26px auto 0;text-align:center;font-size:12.5px;color:var(--tinta-suave)}
+
+  /* ---------- Gantt de disponibilidad ---------- */
+  .gantt-wrap{overflow-x:auto;background:var(--blanco);border:1px solid var(--linea);
+    border-radius:var(--radius);padding-bottom:8px}
+  .g-inner{position:relative;min-width:fit-content}
+  .g-row{display:flex;align-items:stretch;height:26px}
+  .g-row:hover .g-label{color:var(--terra-osc)}
+  .g-label{position:sticky;left:0;background:var(--blanco);width:190px;flex:none;font-size:12px;
+    display:flex;align-items:center;gap:6px;padding:0 10px;border-right:1px solid var(--linea);
+    z-index:2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .g-cells{display:flex}
+  .g-c{width:12px;flex:none;border-right:1px solid rgba(46,51,46,.035)}
+  .g-c.wk{border-right:1.5px solid var(--linea)}
+  .g-c.off{background:#F6F3ED}
+  .g-c.disp{background:#C9DCC4}
+  .g-c.test{background:var(--terra)}
+  .g-c.mal{background:var(--mal)}
+  .g-row.g-head{height:26px;margin-bottom:2px}
+  .g-row.g-head .g-label{font-weight:800;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta-suave)}
+  .g-week{font-size:10px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;
+    flex:none;border-right:2px solid var(--blanco)}
+  .g-row.g-secrow{height:32px;background:var(--crema)}
+  .g-label.g-sec{font-weight:800;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--tinta-suave);background:var(--crema);border-right:1px solid var(--linea)}
+  .g-hoy{position:absolute;top:0;bottom:0;width:2px;background:var(--tinta);z-index:3;pointer-events:none}
+  .leyenda .cua{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+  /* ---------- Print ---------- */
+  @media print{
+    @page{size:A4;margin:12mm}
+    body{background:#fff}
+    .appbar,.subnav,.dieta-hero,.nota-proto,.no-print{display:none !important}
+    main{padding:0;max-width:none}
+    section.vista{display:none !important}
+    #vGeneralWrap{display:block !important}
+    table.gen{font-size:11px}
+    table.gen th{background:#eee !important;color:#000;-webkit-print-color-adjust:exact}
+    .gen-box{break-inside:avoid}
+    table.gen tr{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<div class="appbar">
+  <div class="brand" onclick="irMenu('dietas')"><small>mi plan</small>Plan de Alimentación</div>
+  <div class="menu">
+    <button id="m-dietas" class="activo" onclick="irMenu('dietas')">🌿 Dietas</button>
+    <button id="m-recetas" onclick="irMenu('recetas')">🍳 Recetas</button>
+    <button id="m-ingredientes" onclick="irMenu('ingredientes')">🧺 Ingredientes</button>
+  </div>
+</div>
+
+<main>
+  <!-- ============ DIETAS (lista) ============ -->
+  <section class="vista visible" id="vDietas">
+    <div class="vista-head">
+      <h2>Mis dietas</h2>
+      <p>Planes armados con los ingredientes y recetas del catálogo. Abrí uno para ver su timeline.</p>
+    </div>
+    <div class="dietas-grid" id="dietasGrid"></div>
+  </section>
+
+  <!-- ============ DIETA ACTIVA (timeline + general) ============ -->
+  <section class="vista" id="vDieta">
+    <button class="volver" onclick="irMenu('dietas')">← Todas las dietas</button>
+    <div class="dieta-hero">
+      <div class="eyebrow">p r o t o c o l o&nbsp;&nbsp;i n t e s t i n a l</div>
+      <h1>Protocolo Intestinal</h1>
+      <div class="sub" id="dietaSub"></div>
+      <div class="fecha-editor">
+        <label for="fechaInicio">Inicio del plan:</label>
+        <input type="date" id="fechaInicio" value="2026-08-03" onchange="cambiarInicio(this.value)">
+      </div>
+      <div class="hoy-banner" id="hoyBanner"></div>
+    </div>
+    <div class="subnav">
+      <button id="sn-timeline" class="activo" onclick="verSubvista('timeline')">Timeline</button>
+      <button id="sn-gantt" onclick="verSubvista('gantt')">Disponibilidad</button>
+      <button id="sn-general" onclick="verSubvista('general')">Vista general</button>
+      <button onclick="imprimir()">🖨 Imprimir / PDF</button>
+    </div>
+
+    <div id="vTimelineWrap">
+      <div class="leyenda">
+        <span><i style="background:var(--salvia)"></i> Exclusión</span>
+        <span><i style="background:var(--azul)"></i> Probióticos</span>
+        <span><i style="background:var(--terra)"></i> Reintroducción</span>
+        <span><i style="background:var(--neutro)"></i> Mantenimiento</span>
+      </div>
+      <div class="banda-wrap">
+        <div class="banda" id="banda"></div>
+        <div class="marcador-hoy" id="marcadorHoy" style="display:none"></div>
+      </div>
+      <div class="grid" id="gridSemanas"></div>
+      <p class="nota-proto">Prototipo de diseño — cambios de fecha y estados no se guardan al recargar; en la app final viven en la base de datos.</p>
+    </div>
+
+    <div id="vGeneralWrap" style="display:none">
+      <div class="gen-head">
+        <h2>Vista general del protocolo</h2>
+        <p id="genSub"></p>
+      </div>
+      <table class="gen">
+        <thead><tr><th>Semana</th><th>Fechas</th><th>Fase</th><th>Qué pasa</th></tr></thead>
+        <tbody id="genBody"></tbody>
+      </table>
+      <div class="gen-cols">
+        <div class="gen-box"><h3>✅ Base segura (todo el protocolo)</h3><div id="genBase"></div></div>
+        <div class="gen-box"><h3>🚫 A evitar (hasta reintroducir)</h3><div id="genEvitar"></div></div>
+      </div>
+      <div class="gen-reglas" id="genReglas"></div>
+    </div>
+
+    <div id="vGanttWrap" style="display:none">
+      <div class="gen-head">
+        <h2>Disponibilidad de ingredientes</h2>
+        <p id="ganttSub"></p>
+      </div>
+      <div class="buscador"><input id="buscaGantt" type="search" placeholder="Filtrar ingredientes…" oninput="renderGantt()"></div>
+      <div class="leyenda">
+        <span><span class="cua" style="background:#C9DCC4"></span> Disponible</span>
+        <span><span class="cua" style="background:var(--terra)"></span> En prueba (4 días)</span>
+        <span><span class="cua" style="background:var(--mal)"></span> Con síntomas → retirado</span>
+        <span><span class="cua" style="background:#F6F3ED;border:1px solid var(--linea)"></span> Todavía no</span>
+      </div>
+      <div class="gantt-wrap"><div class="g-inner" id="ganttInner"></div></div>
+      <p class="nota-proto">Cada columna es un día. Los ingredientes de reintroducción aparecen cuando arranca su bloque de prueba;
+      si marcás un bloque "con síntomas" en el timeline, acá se ve el corte. Pasá el mouse por una fila para ver el detalle.</p>
+    </div>
+  </section>
+
+  <!-- ============ RECETAS ============ -->
+  <section class="vista" id="vRecetas">
+    <div class="vista-head">
+      <h2>Recetas</h2>
+      <p>Armadas con ingredientes del catálogo. Los valores nutricionales se calculan sumando las cantidades (aproximados, por porción).</p>
+    </div>
+    <div class="filtros" id="filtrosRecetas"></div>
+    <div class="recetas-grid" id="recetasGrid"></div>
+  </section>
+
+  <!-- ============ INGREDIENTES ============ -->
+  <section class="vista" id="vIngredientes">
+    <div class="vista-head">
+      <h2>Ingredientes</h2>
+      <p>Catálogo con valores nutricionales aproximados por 100 g. Con estos componentes se arman las recetas y las dietas.</p>
+    </div>
+    <div class="buscador"><input id="busca" type="search" placeholder="Buscar ingrediente…" oninput="renderIngredientes()"></div>
+    <div class="filtros" id="filtrosIng"></div>
+    <div class="ing-grid" id="ingGrid"></div>
+    <p class="nota-imagen">📷 En la app final cada ingrediente puede tener una foto propia; el prototipo usa íconos.</p>
+  </section>
+</main>
+
+<!-- Modal detalle semana -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)cerrarDetalle()">
+  <div class="detalle" id="detalle"></div>
+</div>
+
+<script>
+/* =================================================================
+   CATÁLOGO DE INGREDIENTES — valores aprox por 100 g: [kcal, prot, hidratos, grasas]
+   ================================================================= */
+const CATS = [
+  {id:"proteinas", n:"Proteínas", e:"🐟"},
+  {id:"grasas", n:"Grasas saludables", e:"🥑"},
+  {id:"vegetales", n:"Vegetales", e:"🥕"},
+  {id:"tuberculos", n:"Tubérculos y arroz", e:"🍚"},
+  {id:"frutas", n:"Frutas", e:"🫐"},
+  {id:"otros", n:"Otros y especias", e:"🍄"},
+  {id:"reintro", n:"Reintroducción", e:"🔄"}
+];
+
+const ING = {
+  arenque:{n:"Arenque",cat:"proteinas",e:"🐟",v:[203,18,0,13]},
+  sardina:{n:"Sardina",cat:"proteinas",e:"🐟",v:[208,25,0,11]},
+  salmon:{n:"Salmón",cat:"proteinas",e:"🐟",v:[208,20,0,13]},
+  caballa:{n:"Caballa",cat:"proteinas",e:"🐟",v:[205,19,0,14]},
+  bacalao:{n:"Bacalao",cat:"proteinas",e:"🐟",v:[82,18,0,0.7]},
+  pollo:{n:"Pollo",cat:"proteinas",e:"🍗",v:[165,27,0,6]},
+  pavo:{n:"Pavo",cat:"proteinas",e:"🦃",v:[135,29,0,1]},
+  carne:{n:"Carne vacuna",cat:"proteinas",e:"🥩",v:[250,26,0,15]},
+  huevo:{n:"Huevos",cat:"proteinas",e:"🥚",v:[143,13,1,10]},
+  almejas:{n:"Almejas",cat:"proteinas",e:"🐚",v:[74,13,3,1]},
+  mejillones:{n:"Mejillones",cat:"proteinas",e:"🦪",v:[86,12,4,2]},
+  pulpo:{n:"Pulpo",cat:"proteinas",e:"🐙",v:[82,15,2,1]},
+  oliva:{n:"Aceite de oliva",cat:"grasas",e:"🫒",v:[884,0,0,100]},
+  palta:{n:"Palta",cat:"grasas",e:"🥑",v:[160,2,9,15]},
+  aceiteCoco:{n:"Aceite de coco",cat:"grasas",e:"🥥",v:[862,0,0,100]},
+  nuecesBrasil:{n:"Nueces de Brasil",cat:"grasas",e:"🌰",v:[659,14,12,67]},
+  macadamias:{n:"Macadamias",cat:"grasas",e:"🌰",v:[718,8,14,76]},
+  avellanas:{n:"Avellanas",cat:"grasas",e:"🌰",v:[628,15,17,61]},
+  almendras:{n:"Almendras remojadas",cat:"grasas",e:"🌰",v:[579,21,22,50]},
+  calabacin:{n:"Calabacín",cat:"vegetales",e:"🥒",v:[17,1.2,3,0.3],nota:"sin piel ni semillas"},
+  calabaza:{n:"Calabaza",cat:"vegetales",e:"🎃",v:[26,1,6.5,0.1]},
+  canonigos:{n:"Canónigos",cat:"vegetales",e:"🥬",v:[21,2,3.6,0.4]},
+  berenjena:{n:"Berenjena",cat:"vegetales",e:"🍆",v:[25,1,6,0.2]},
+  esparragos:{n:"Espárragos",cat:"vegetales",e:"🌿",v:[20,2.2,3.9,0.1]},
+  espinaca:{n:"Espinaca",cat:"vegetales",e:"🥬",v:[23,2.9,3.6,0.4]},
+  rabano:{n:"Rábano y raíces",cat:"vegetales",e:"🌱",v:[16,0.7,3.4,0.1]},
+  pimiento:{n:"Pimientos",cat:"vegetales",e:"🫑",v:[31,1,6,0.3]},
+  puerro:{n:"Puerro",cat:"vegetales",e:"🥬",v:[61,1.5,14,0.3]},
+  rucula:{n:"Rúcula",cat:"vegetales",e:"🥬",v:[25,2.6,3.7,0.7]},
+  tomate:{n:"Tomate",cat:"vegetales",e:"🍅",v:[18,0.9,3.9,0.2]},
+  zanahoria:{n:"Zanahoria",cat:"vegetales",e:"🥕",v:[41,0.9,10,0.2]},
+  zapallo:{n:"Zapallo",cat:"vegetales",e:"🎃",v:[26,1,6.5,0.1]},
+  champinones:{n:"Hongos y champiñones",cat:"vegetales",e:"🍄",v:[22,3.1,3.3,0.3]},
+  boniato:{n:"Boniato",cat:"tuberculos",e:"🍠",v:[86,1.6,20,0.1]},
+  papa:{n:"Papa",cat:"tuberculos",e:"🥔",v:[77,2,17,0.1]},
+  yuca:{n:"Yuca",cat:"tuberculos",e:"🥔",v:[160,1.4,38,0.3]},
+  arroz:{n:"Arroz cocido",cat:"tuberculos",e:"🍚",v:[130,2.7,28,0.3]},
+  arandanos:{n:"Arándanos",cat:"frutas",e:"🫐",v:[57,0.7,14,0.3]},
+  moras:{n:"Moras",cat:"frutas",e:"🫐",v:[43,1.4,10,0.5]},
+  frambuesas:{n:"Frambuesas",cat:"frutas",e:"🍓",v:[52,1.2,12,0.7]},
+  fresas:{n:"Fresas",cat:"frutas",e:"🍓",v:[32,0.7,7.7,0.3]},
+  limon:{n:"Limón",cat:"frutas",e:"🍋",v:[29,1.1,9,0.3]},
+  coco:{n:"Coco",cat:"frutas",e:"🥥",v:[354,3.3,15,33]},
+  jengibre:{n:"Jengibre",cat:"otros",e:"🫚",v:[80,1.8,18,0.8]},
+  curcuma:{n:"Cúrcuma",cat:"otros",e:"🟠",v:[354,8,65,10]},
+  canela:{n:"Canela",cat:"otros",e:"🟤",v:[247,4,81,1.2]},
+  teVerde:{n:"Té verde",cat:"otros",e:"🍵",v:[1,0,0,0]},
+  caldo:{n:"Caldo de huesos",cat:"otros",e:"🍲",v:[30,6,0,0.5]},
+  manzana:{n:"Manzana",cat:"reintro",e:"🍎",v:[52,0.3,14,0.2]},
+  pera:{n:"Pera",cat:"reintro",e:"🍐",v:[57,0.4,15,0.1]},
+  brocoli:{n:"Brócoli",cat:"reintro",e:"🥦",v:[34,2.8,7,0.4]},
+  coliflor:{n:"Coliflor",cat:"reintro",e:"🥦",v:[25,1.9,5,0.3]},
+  quinoa:{n:"Quinoa cocida",cat:"reintro",e:"🌾",v:[120,4.4,21,1.9]},
+  sarraceno:{n:"Trigo sarraceno cocido",cat:"reintro",e:"🥞",v:[92,3.4,20,0.6]},
+  avenaSG:{n:"Avena sin gluten",cat:"reintro",e:"🥣",v:[389,17,66,7]},
+  lentejas:{n:"Lentejas cocidas",cat:"reintro",e:"🫘",v:[116,9,20,0.4],nota:"remojadas y bien cocidas"},
+  chucrut:{n:"Chucrut",cat:"reintro",e:"🫙",v:[19,0.9,4.3,0.1]},
+  quesoCabra:{n:"Queso de cabra curado",cat:"reintro",e:"🐐",v:[452,30,2,36]},
+  panEspelta:{n:"Pan de espelta masa madre",cat:"reintro",e:"🍞",v:[240,9,48,1.5]},
+  quesoVaca:{n:"Queso duro de vaca",cat:"reintro",e:"🧀",v:[400,25,1.3,33]},
+  yogur:{n:"Yogur",cat:"reintro",e:"🥛",v:[61,3.5,4.7,3.3]},
+  leche:{n:"Leche",cat:"reintro",e:"🥛",v:[64,3.3,4.8,3.6]}
+};
+
+/* =================================================================
+   RECETAS — ing: [id, gramos]; fase: "base" | índice de bloque
+   ================================================================= */
+const RECETAS = [
+  {n:"Tortilla de huevos con champiñones y espinaca",t:"desayuno",fase:"base",ing:[["huevo",120],["champinones",80],["espinaca",60],["oliva",10]]},
+  {n:"Bowl de frutos rojos con coco y avellanas",t:"desayuno",fase:"base",ing:[["arandanos",80],["frambuesas",60],["coco",20],["avellanas",20]]},
+  {n:"Huevos revueltos con palta y tomate asado",t:"desayuno",fase:"base",ing:[["huevo",120],["palta",70],["tomate",80],["oliva",5]]},
+  {n:"Salmón al horno con puré de calabaza",t:"comida",fase:"base",ing:[["salmon",150],["calabaza",250],["oliva",10]]},
+  {n:"Pollo al limón con boniato y zanahorias",t:"comida",fase:"base",ing:[["pollo",150],["boniato",200],["zanahoria",100],["limon",30],["oliva",10]]},
+  {n:"Wok de carne con pimientos, calabacín y arroz",t:"comida",fase:"base",ing:[["carne",130],["pimiento",80],["calabacin",100],["arroz",150],["jengibre",5],["oliva",10]]},
+  {n:"Sardinas con tomate y puerro asados",t:"comida",fase:"base",ing:[["sardina",120],["tomate",150],["puerro",80],["papa",150],["oliva",10]]},
+  {n:"Mejillones al vapor con limón y papas",t:"comida",fase:"base",ing:[["mejillones",200],["limon",30],["papa",200],["oliva",10]]},
+  {n:"Bacalao con puré de boniato y espárragos",t:"comida",fase:"base",ing:[["bacalao",150],["boniato",200],["esparragos",100],["oliva",10]]},
+  {n:"Berenjenas rellenas de pavo",t:"comida",fase:"base",ing:[["berenjena",200],["pavo",120],["tomate",80],["curcuma",2],["oliva",10]]},
+  {n:"Caldo de huesos con raíces y jengibre",t:"cena",fase:"base",ing:[["caldo",300],["zanahoria",80],["rabano",50],["jengibre",5]]},
+  {n:"Crema de calabaza y zanahoria con cúrcuma",t:"cena",fase:"base",ing:[["calabaza",200],["zanahoria",100],["curcuma",2],["aceiteCoco",10]]},
+  {n:"Tortilla francesa con canónigos",t:"cena",fase:"base",ing:[["huevo",120],["canonigos",40],["oliva",8]]},
+  {n:"Manzana asada con canela y coco",t:"snack",fase:0,ing:[["manzana",150],["canela",2],["coco",10]]},
+  {n:"Compota de pera con jengibre",t:"snack",fase:0,ing:[["pera",150],["jengibre",3]]},
+  {n:"Ensalada de canónigos, zanahoria y palta",t:"comida",fase:1,ing:[["canonigos",60],["zanahoria",80],["palta",70],["limon",20],["oliva",10]]},
+  {n:"Brócoli al vapor con oliva y limón",t:"comida",fase:2,ing:[["brocoli",200],["oliva",10],["limon",15]]},
+  {n:"Coliflor asada con cúrcuma",t:"comida",fase:2,ing:[["coliflor",200],["curcuma",2],["oliva",10]]},
+  {n:"Quinoa con verduras asadas",t:"comida",fase:3,ing:[["quinoa",150],["calabacin",80],["pimiento",80],["oliva",10]]},
+  {n:"Ensalada tibia de quinoa y pollo",t:"comida",fase:3,ing:[["quinoa",120],["pollo",100],["espinaca",50],["oliva",10]]},
+  {n:"Panqueques de trigo sarraceno con arándanos",t:"desayuno",fase:4,ing:[["sarraceno",100],["huevo",60],["arandanos",60]]},
+  {n:"Porridge de avena con frutos rojos",t:"desayuno",fase:5,ing:[["avenaSG",40],["arandanos",60],["canela",2],["coco",10]]},
+  {n:"Guiso de lentejas con calabaza y zanahoria",t:"comida",fase:6,ing:[["lentejas",200],["calabaza",100],["zanahoria",80],["oliva",10]]},
+  {n:"Chucrut junto a la comida principal",t:"snack",fase:7,ing:[["chucrut",30]]},
+  {n:"Queso de cabra curado, porción chica",t:"snack",fase:8,ing:[["quesoCabra",30]]},
+  {n:"Tostada de espelta masa madre con palta",t:"desayuno",fase:9,ing:[["panEspelta",50],["palta",50]]},
+  {n:"Escalera láctea: queso duro → yogur → leche",t:"snack",fase:10,ing:[["quesoVaca",30],["yogur",125],["leche",100]],nota:"un lácteo por vez, en ese orden y en días distintos"}
+];
+
+function macrosDe(r){
+  let kcal=0,p=0,c=0,f=0;
+  r.ing.forEach(([id,g])=>{
+    const v=ING[id].v, k=g/100;
+    kcal+=v[0]*k; p+=v[1]*k; c+=v[2]*k; f+=v[3]*k;
+  });
+  return {kcal:Math.round(kcal),p:Math.round(p),c:Math.round(c),f:Math.round(f)};
+}
+
+/* =================================================================
+   PLAN / TIMELINE
+   ================================================================= */
+const FASES = {
+  exclusion:{nombre:"Exclusión",color:"var(--salvia)",hex:"#3F5741",desc:"Reducir la inflamación y reparar la barrera intestinal eliminando irritantes."},
+  probioticos:{nombre:"Probióticos",color:"var(--azul)",hex:"#4A6B8C",desc:"Misma dieta de exclusión + probióticos (ej. Bonusan Bacteri 17 Resilience Pro, 1 sobre después de comer)."},
+  reintroduccion:{nombre:"Reintroducción",color:"var(--terra)",hex:"#8F5F2E",desc:"Reintroducir alimentos de a uno, con la regla de los 4 días."},
+  mantenimiento:{nombre:"Mantenimiento",color:"var(--neutro)",hex:"#7d7970",desc:"Dieta ampliada con todo lo que toleraste."}
+};
+
+const BASE = [
+  {g:"🐟 Proteínas", ids:["arenque","sardina","salmon","caballa","bacalao","pollo","pavo","carne","huevo","almejas","mejillones","pulpo"]},
+  {g:"🥑 Grasas saludables", ids:["oliva","palta","aceiteCoco","nuecesBrasil","macadamias","avellanas","almendras"]},
+  {g:"🥕 Vegetales cocidos", ids:["calabacin","calabaza","canonigos","berenjena","esparragos","espinaca","rabano","pimiento","puerro","rucula","tomate","zanahoria","zapallo"]},
+  {g:"🍚 Tubérculos y arroz", ids:["boniato","papa","yuca","arroz"]},
+  {g:"🫐 Frutas (baja carga glucémica)", ids:["arandanos","moras","frambuesas","fresas","limon","coco"]},
+  {g:"🍄 Otros", ids:["champinones","jengibre","curcuma","canela","teVerde","caldo"]}
+];
+
+const EVITAR = [
+  ["Lácteos (todos)","leche, queso, yogur y kéfir — vaca, cabra u oveja"],
+  ["Gluten y cereales","trigo, centeno, cebada y avena (en esta fase)"],
+  ["Legumbres","alubias, lentejas, garbanzos, soja/tofu"],
+  ["Ultraprocesados y aditivos","glutamato monosódico, sulfitos, edulcorantes artificiales"],
+  ["Azúcares","azúcar blanco, harinas refinadas, gaseosas, jugos industriales"],
+  ["Grasas de mala calidad","aceites refinados (girasol, maíz), margarinas, grasas trans"]
+];
+
+const REGLAS_DIARIAS = [
+  "Máximo <b>3 ingestas al día</b> (deja actuar al Complejo Motor Migratorio).",
+  "<b>Cena temprana y ligera</b>: al menos 3 h antes de dormir (salvo guardia).",
+  "Mantener el <b>Gut Day</b> antes de las comidas durante todo el protocolo."
+];
+const REGLAS_REINTRO = [
+  "Un solo alimento nuevo <b>a la vez</b>.",
+  "<b>Regla de los 4 días</b>: empezar con cantidad mínima e ir aumentando; observar gases, calor en piel, cambios de tránsito.",
+  "<b>No introducir</b> un alimento nuevo después de una noche de guardia sin dormir (falso positivo).",
+  "Ante reacción: retirar el alimento y volver al último punto bien tolerado."
+];
+
+const BLOQUES = [
+  {n:"Frutas nuevas",e:"🍎",tip:"Fibra soluble: manzana o pera cocida/asada, frutas con algo más de fructosa."},
+  {n:"Verduras crudas y hojas verdes",e:"🥗",tip:"Incorporar de manera paulatina. Incluye alcaucil cocido."},
+  {n:"Crucíferas",e:"🥦",tip:"Brócoli, coliflor… bien cocidas al principio."},
+  {n:"Quinoa",e:"🌾",tip:"Pseudocereal sin gluten. Poca cantidad y bien cocida."},
+  {n:"Trigo sarraceno",e:"🥞",tip:"Pseudocereal sin gluten. Poca cantidad y bien cocido."},
+  {n:"Avena sin gluten",e:"🥣",tip:"Certificada sin gluten."},
+  {n:"Lentejas",e:"🫘",tip:"Remojadas y muy bien cocidas para reducir antinutrientes."},
+  {n:"Fermentados",e:"🫙",tip:"Chucrut/kimchi en cantidades chicas."},
+  {n:"Lácteos de cabra/oveja",e:"🐐",tip:"Empezar por quesos duros/curados."},
+  {n:"Gluten",e:"🍞",tip:"Espelta / masa madre. Solo si estás asintomática."},
+  {n:"Lácteos de vaca",e:"🥛",tip:"Queso duro → yogur/kéfir → leche. Solo si estás asintomática."}
+].map((b,i)=>({...b,i,estado:"pendiente"}));
+
+const DIAS_EXCLUSION=21, DIAS_PROBIO=7, DIAS_BLOQUE=4;
+let INICIO = new Date(2026,7,3);
+let SEMANAS = [], DIAS_PLAN = 0;
+
+function sumaDias(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function fmt(d){return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")}
+function fmtLargo(d){const dias=["dom","lun","mar","mié","jue","vie","sáb"];return dias[d.getDay()]+" "+fmt(d)}
+
+function recalc(){
+  const reintroIni = sumaDias(INICIO, DIAS_EXCLUSION+DIAS_PROBIO);
+  BLOQUES.forEach((b,i)=>{ b.ini=sumaDias(reintroIni,i*DIAS_BLOQUE); b.fin=sumaDias(reintroIni,i*DIAS_BLOQUE+DIAS_BLOQUE-1); });
+  const totalDias = DIAS_EXCLUSION+DIAS_PROBIO+BLOQUES.length*DIAS_BLOQUE;
+  const numSemanas = Math.ceil(totalDias/7);
+  DIAS_PLAN = numSemanas*7;
+  SEMANAS = Array.from({length:numSemanas},(_,w)=>{
+    const ini=sumaDias(INICIO,w*7), fin=sumaDias(INICIO,w*7+6);
+    const off=w*7;
+    const fase = off<DIAS_EXCLUSION ? "exclusion" : off<DIAS_EXCLUSION+DIAS_PROBIO ? "probioticos" : "reintroduccion";
+    const bloques = BLOQUES.filter(b=>b.ini<=fin && b.fin>=ini);
+    const previos = BLOQUES.filter(b=>b.fin<ini);
+    return {w,num:w+1,ini,fin,fase,bloques,previos};
+  });
+}
+
+const HOY=new Date(); HOY.setHours(0,0,0,0);
+function semanaDeHoy(){ return SEMANAS.find(s=>HOY>=s.ini && HOY<=s.fin)||null }
+
+function cambiarInicio(iso){
+  if(!iso) return;
+  const [y,m,d]=iso.split("-").map(Number);
+  INICIO=new Date(y,m-1,d);
+  recalc(); renderDieta(); renderGeneral(); renderGantt(); renderDietas();
+}
+
+/* ---------- render dieta ---------- */
+function iconoEstado(b){return b.estado==="tolerado"?"✅":b.estado==="con_sintomas"?"⚠️":""}
+
+function renderDieta(){
+  const finPlan=BLOQUES[BLOQUES.length-1].fin;
+  document.getElementById("dietaSub").textContent =
+    `María Brandani · ${fmt(INICIO)} → ${fmt(finPlan)} · Nutricionista: Milagros Fernández`;
+
+  // hoy banner + marcador
+  const s=semanaDeHoy(), bn=document.getElementById("hoyBanner"), m=document.getElementById("marcadorHoy");
+  m.style.display="none";
+  if(s){
+    const f=FASES[s.fase];
+    const enPrueba=s.bloques.filter(x=>HOY>=x.ini&&HOY<=x.fin).map(x=>x.e+" "+x.n).join(", ");
+    bn.innerHTML=`<span class="hoy-dot" style="background:${f.color}"></span>
+      <span>Hoy · <b>Semana ${s.num}</b> · <b>${f.nombre}</b>${enPrueba?` · en prueba: <b>${enPrueba}</b>`:""}</span>
+      <span class="ver">Ver detalle →</span>`;
+    bn.onclick=()=>abrirDetalle(s.w);
+    const dias=(HOY-INICIO)/86400000;
+    if(dias>=0&&dias<=DIAS_PLAN){m.style.display="block";m.style.left=(dias/DIAS_PLAN*100)+"%"}
+  } else if(HOY<INICIO){
+    bn.innerHTML=`<span>El plan empieza el <b>${fmtLargo(INICIO)}</b></span>`; bn.onclick=null;
+  } else {
+    bn.innerHTML=`<span>Reintroducción completada 🎉 — <b>mantenimiento</b> con todo lo tolerado</span>`; bn.onclick=null;
+  }
+
+  // banda
+  const banda=document.getElementById("banda"); banda.innerHTML="";
+  SEMANAS.forEach(s=>{
+    const seg=document.createElement("div");
+    seg.className="seg"; seg.style.background=FASES[s.fase].color;
+    seg.innerHTML=`<small>S${s.num}</small>`;
+    seg.title=`Semana ${s.num} · ${fmt(s.ini)}–${fmt(s.fin)}`;
+    seg.onclick=()=>abrirDetalle(s.w);
+    banda.appendChild(seg);
+  });
+
+  // tarjetas
+  const g=document.getElementById("gridSemanas"); g.innerHTML="";
+  const sHoy=semanaDeHoy();
+  SEMANAS.forEach(s=>{
+    const f=FASES[s.fase]; let lineas="";
+    if(s.fase==="exclusion"){
+      lineas=`<li><span>🍽 Solo alimentos de la <b>base segura</b></span></li>
+              <li class="mini-tag"><span>Semana ${s.num} de 3 de exclusión</span></li>`;
+    } else if(s.fase==="probioticos"){
+      lineas=`<li><span>💊 Arrancan los <b>probióticos</b> (1 sobre después de comer)</span></li>
+              <li class="mini-tag"><span>Dieta igual que en exclusión</span></li>`;
+    } else {
+      lineas=s.bloques.map(b=>`<li>${b.e} <span><b>${b.n}</b> <span class="mini-tag">${fmt(b.ini)}–${fmt(b.fin)}</span> ${iconoEstado(b)}</span></li>`).join("");
+    }
+    const card=document.createElement("div");
+    card.className="card"+(sHoy&&sHoy.w===s.w?" actual":"");
+    card.style.setProperty("--pc",f.color);
+    card.innerHTML=`<div class="fila1"><h3>Semana ${s.num}</h3><span class="fechas">${fmt(s.ini)} – ${fmt(s.fin)}</span></div>
+      <span class="chip">${f.nombre}</span><ul>${lineas}</ul>`;
+    card.onclick=()=>abrirDetalle(s.w);
+    g.appendChild(card);
+  });
+}
+
+/* ---------- detalle semana ---------- */
+function recetaFila(r){
+  const mm=macrosDe(r);
+  return `<li><i>${r.n}</i><span style="white-space:nowrap;font-weight:700">${mm.kcal} kcal</span></li>`;
+}
+function abrirDetalle(w){
+  const s=SEMANAS[w], f=FASES[s.fase], d=document.getElementById("detalle");
+  const previosTolerados=s.previos.filter(b=>b.estado!=="con_sintomas");
+
+  let enPruebaHTML="";
+  if(s.bloques.length){
+    enPruebaHTML=`<h4>En prueba esta semana</h4>`+s.bloques.map(b=>{
+      const recs=RECETAS.filter(r=>r.fase===b.i);
+      return `<div class="bloque-prueba">
+        <div class="bp-top"><b>${b.e} ${b.n}</b><span class="rango">${fmtLargo(b.ini)} → ${fmtLargo(b.fin)}</span></div>
+        <p>${b.tip}</p>
+        ${recs.length?`<p>🍽 ${recs.map(r=>`${r.n} <b>(${macrosDe(r).kcal} kcal)</b>`).join(" · ")}</p>`:""}
+        <div class="estado-botones">
+          <button class="${b.estado==='tolerado'?'sel-ok':''}" onclick="marcar(${b.i},'tolerado',${w})">✓ Tolerado</button>
+          <button class="${b.estado==='con_sintomas'?'sel-mal':''}" onclick="marcar(${b.i},'con_sintomas',${w})">✕ Con síntomas</button>
+        </div></div>`;
+    }).join("");
+  }
+
+  const baseHTML=BASE.map(g=>`<div class="grupo"><div class="gtit">${g.g}</div>
+    <div class="pills">${g.ids.map(id=>`<span class="pill">${ING[id].n.toLowerCase()}</span>`).join("")}</div></div>`).join("");
+
+  const reintroducidosHTML=previosTolerados.length?`<h4>Ya reintroducidos (si los toleraste)</h4>
+    <div class="pills" style="margin-bottom:4px">${previosTolerados.map(b=>`<span class="pill reintro">${b.e} ${b.n}</span>`).join("")}</div>`:"";
+
+  const recetasBase=RECETAS.filter(r=>r.fase==="base");
+  const reglas=[...REGLAS_DIARIAS,...(s.fase==="reintroduccion"?REGLAS_REINTRO:[])];
+
+  d.innerHTML=`<button class="cerrar" onclick="cerrarDetalle()">✕</button>
+    <h2>Semana ${s.num}</h2>
+    <div class="sub">${fmtLargo(s.ini)} → ${fmtLargo(s.fin)} · <span style="color:${f.hex};font-weight:700">${f.nombre}</span></div>
+    <p style="font-size:14px;color:var(--tinta-suave)">${f.desc}</p>
+    ${enPruebaHTML}${reintroducidosHTML}
+    <h4>Base segura — siempre permitidos</h4>${baseHTML}
+    <details class="evitar"><summary>🚫 A evitar${s.fase==="reintroduccion"?" (lo que aún no reintrodujiste)":""}</summary>
+      <ul>${EVITAR.map(e=>`<li><b>${e[0]}:</b> ${e[1]}</li>`).join("")}</ul></details>
+    <h4>Ideas de platos (kcal por porción aprox)</h4>
+    <div class="receta"><ul style="margin:0">${recetasBase.map(recetaFila).join("")}</ul></div>
+    <p style="font-size:12.5px;color:var(--tinta-suave);margin-top:8px">Detalle completo con macros en la sección <b>Recetas</b> del menú.</p>
+    <h4>Reglas de la fase</h4>
+    <div class="reglas"><ul>${reglas.map(r=>`<li>${r}</li>`).join("")}</ul></div>`;
+  document.getElementById("overlay").classList.add("abierto");
+  document.body.style.overflow="hidden";
+}
+function cerrarDetalle(){document.getElementById("overlay").classList.remove("abierto");document.body.style.overflow=""}
+function marcar(i,estado,w){BLOQUES[i].estado=BLOQUES[i].estado===estado?"pendiente":estado;renderDieta();renderGeneral();renderGantt();abrirDetalle(w)}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")cerrarDetalle()});
+
+/* ---------- vista general ---------- */
+function renderGeneral(){
+  document.getElementById("genSub").textContent=
+    `Semana a semana · inicio ${fmtLargo(INICIO)} de ${INICIO.getFullYear()} · regla de los 4 días en reintroducción`;
+  const tb=document.getElementById("genBody"); tb.innerHTML="";
+  SEMANAS.forEach(s=>{
+    const f=FASES[s.fase]; let que="";
+    if(s.fase==="exclusion") que=`Solo base segura · semana ${s.num} de 3 de exclusión`;
+    else if(s.fase==="probioticos") que="Base segura + probióticos (1 sobre después de comer)";
+    else que=s.bloques.map(b=>`${b.e} ${b.n} <i>(${fmt(b.ini)}–${fmt(b.fin)})</i> ${iconoEstado(b)}`).join(" · ");
+    tb.insertAdjacentHTML("beforeend",`<tr class="f-${s.fase}"><td><b>S${s.num}</b></td>
+      <td>${fmt(s.ini)} – ${fmt(s.fin)}</td>
+      <td><span class="fase-mini" style="color:${f.hex}">${f.nombre}</span></td><td>${que}</td></tr>`);
+  });
+  const finPlan=sumaDias(BLOQUES[BLOQUES.length-1].fin,1);
+  tb.insertAdjacentHTML("beforeend",`<tr class="f-mantenimiento"><td><b>S${SEMANAS.length+1}+</b></td>
+    <td>desde ${fmt(finPlan)}</td><td><span class="fase-mini" style="color:#7d7970">Mantenimiento</span></td>
+    <td>Dieta ampliada con todo lo tolerado 🎉</td></tr>`);
+  document.getElementById("genBase").innerHTML=BASE.map(g=>
+    `<p><b>${g.g}:</b> ${g.ids.map(id=>ING[id].n.toLowerCase()).join(", ")}.</p>`).join("");
+  document.getElementById("genEvitar").innerHTML=EVITAR.map(e=>`<p><b>${e[0]}:</b> ${e[1]}.</p>`).join("");
+  document.getElementById("genReglas").innerHTML="<b>Reglas:</b> "+
+    [...REGLAS_DIARIAS,...REGLAS_REINTRO].map(r=>r.replace(/<\/?b>/g,"")).join(" · ");
+}
+
+/* ---------- dietas (lista) ---------- */
+function renderDietas(){
+  const g=document.getElementById("dietasGrid");
+  const finPlan=BLOQUES[BLOQUES.length-1].fin;
+  const tolerados=BLOQUES.filter(b=>b.estado==="tolerado").length;
+  g.innerHTML=`
+    <div class="dieta-card" onclick="abrirDietaActiva()">
+      <span class="chip-activa">Activa</span>
+      <h3>Protocolo Intestinal</h3>
+      <div class="meta">${fmt(INICIO)} → ${fmt(finPlan)} de ${finPlan.getFullYear()} · Milagros Fernández (PNI)</div>
+      <div class="mini-banda">${SEMANAS.map(s=>`<i style="background:${FASES[s.fase].color}"></i>`).join("")}</div>
+      <div class="meta">3 sem. exclusión · 1 sem. probióticos · ${BLOQUES.length} reintroducciones (${tolerados} toleradas)</div>
+      <span class="abrir">Abrir timeline →</span>
+    </div>
+    <div class="dieta-card nueva">
+      <span class="mas">+</span><b>Nueva dieta</b>
+      <p>En la app final: crear desde cero o <b>duplicar</b> una existente con otra fecha de inicio, reutilizando ingredientes y recetas.</p>
+    </div>`;
+}
+function abrirDietaActiva(){irMenu(null);mostrar("vDieta");verSubvista("timeline")}
+
+/* ---------- recetas ---------- */
+let filtroReceta="todas";
+function renderRecetas(){
+  const wrap=document.getElementById("filtrosRecetas");
+  const tipos=[["todas","Todas"],["desayuno","Desayunos"],["comida","Comidas"],["cena","Cenas"],["snack","Snacks y pruebas"]];
+  wrap.innerHTML=tipos.map(([id,n])=>
+    `<button class="${filtroReceta===id?'activo':''}" onclick="filtroReceta='${id}';renderRecetas()">${n}</button>`).join("");
+  const g=document.getElementById("recetasGrid");
+  g.innerHTML=RECETAS.filter(r=>filtroReceta==="todas"||r.t===filtroReceta).map(r=>{
+    const mm=macrosDe(r);
+    const fase=r.fase==="base"?"Base — todas las fases":`Reintroducción · ${BLOQUES[r.fase].e} ${BLOQUES[r.fase].n}`;
+    return `<div class="receta">
+      <div class="r-top"><h3>${r.n}</h3><span class="tipo">${r.t}</span></div>
+      <div class="fase-tag">${fase}</div>
+      <ul>${r.ing.map(([id,gr])=>`<li><i>${ING[id].e} ${ING[id].n}</i><span>${gr} g</span></li>`).join("")}</ul>
+      ${r.nota?`<div class="fase-tag">⚠️ ${r.nota}</div>`:""}
+      <div class="macros"><span class="kcal">${mm.kcal} kcal</span>
+        <span>P ${mm.p} g</span><span>H ${mm.c} g</span><span>G ${mm.f} g</span></div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- ingredientes ---------- */
+let filtroCat="todas";
+function renderIngredientes(){
+  const wrap=document.getElementById("filtrosIng");
+  wrap.innerHTML=[`<button class="${filtroCat==="todas"?'activo':''}" onclick="filtroCat='todas';renderIngredientes()">Todas</button>`,
+    ...CATS.map(c=>`<button class="${filtroCat===c.id?'activo':''}" onclick="filtroCat='${c.id}';renderIngredientes()">${c.e} ${c.n}</button>`)].join("");
+  const q=(document.getElementById("busca").value||"").toLowerCase();
+  const g=document.getElementById("ingGrid");
+  g.innerHTML=Object.entries(ING)
+    .filter(([id,x])=>(filtroCat==="todas"||x.cat===filtroCat)&&x.n.toLowerCase().includes(q))
+    .map(([id,x])=>{
+      const cat=CATS.find(c=>c.id===x.cat);
+      return `<div class="ing-tile" data-cat="${x.cat}">
+        <div class="foto">${x.e}</div>
+        <b>${x.n}</b><span class="cat">${cat.n}</span>
+        <div class="nut"><b>${x.v[0]}</b> kcal · P ${x.v[1]} · H ${x.v[2]} · G ${x.v[3]}<br><span style="font-size:10.5px">por 100 g</span></div>
+        ${x.nota?`<div class="nut">⚠️ ${x.nota}</div>`:""}
+      </div>`;
+    }).join("");
+}
+
+/* ---------- gantt de disponibilidad ---------- */
+// qué ingrediente del catálogo se habilita con cada bloque de reintroducción
+const GANTT_BLOQUE = {manzana:0,pera:0,brocoli:2,coliflor:2,quinoa:3,sarraceno:4,
+  avenaSG:5,lentejas:6,chucrut:7,quesoCabra:8,panEspelta:9,quesoVaca:10,yogur:10,leche:10};
+
+function diaOff(d){return Math.round((d-INICIO)/86400000)}
+
+function renderGantt(){
+  const inner=document.getElementById("ganttInner"); if(!inner) return;
+  const q=(document.getElementById("buscaGantt").value||"").toLowerCase();
+  document.getElementById("ganttSub").textContent=
+    `Un día por columna · ${fmt(INICIO)} → ${fmt(sumaDias(INICIO,DIAS_PLAN-1))} · en el eje Y, cuándo entra cada ingrediente`;
+  const CW=12;
+  let html=`<div class="g-row g-head"><div class="g-label">Ingrediente / Semana</div><div class="g-cells">`;
+  SEMANAS.forEach(s=>{html+=`<div class="g-week" style="width:${7*CW}px;background:${FASES[s.fase].color}" title="Semana ${s.num} · ${fmt(s.ini)}–${fmt(s.fin)}">S${s.num}</div>`});
+  html+=`</div></div>`;
+
+  const filas=[];
+  const celdas=fn=>{let s="";for(let d=0;d<DIAS_PLAN;d++)s+=`<div class="g-c ${fn(d)}${d%7===6?" wk":""}"></div>`;return s};
+  const filaIng=(nombre,emoji,cells,title)=>{
+    if(q && !nombre.toLowerCase().includes(q)) return;
+    filas.push(`<div class="g-row" title="${title}"><div class="g-label">${emoji} ${nombre}</div><div class="g-cells">${cells}</div></div>`);
+  };
+
+  // base: disponibles todo el plan
+  CATS.filter(c=>c.id!=="reintro").forEach(c=>{
+    const marca=filas.length;
+    filas.push(`<div class="g-row g-secrow"><div class="g-label g-sec">${c.e} ${c.n}</div></div>`);
+    const antes=filas.length;
+    Object.entries(ING).filter(([id,x])=>x.cat===c.id)
+      .forEach(([id,x])=>filaIng(x.n,x.e,celdas(()=>"disp"),`${x.n} — disponible durante todo el plan`));
+    if(filas.length===antes) filas.length=marca; // sin resultados con el filtro → sacar el título
+  });
+
+  // reintroducción: entran con su bloque
+  const marcaR=filas.length;
+  filas.push(`<div class="g-row g-secrow"><div class="g-label g-sec" title="Reintroducción — regla de los 4 días">🔄 Reintroducción</div></div>`);
+  const antesR=filas.length;
+  BLOQUES.forEach(b=>{
+    const i0=diaOff(b.ini), i1=diaOff(b.fin);
+    const fn=d=> d<i0 ? "off" : d<=i1 ? (b.estado==="con_sintomas"?"mal":"test") : (b.estado==="con_sintomas"?"off":"disp");
+    const estadoTxt=b.estado==="con_sintomas"?"con síntomas → retirado":b.estado==="tolerado"?"tolerado ✓":"pendiente";
+    const ings=Object.entries(ING).filter(([id])=>GANTT_BLOQUE[id]===b.i);
+    if(ings.length)
+      ings.forEach(([id,x])=>filaIng(x.n,x.e,celdas(fn),`${x.n} — entra con «${b.n}»: prueba ${fmt(b.ini)}–${fmt(b.fin)} (${estadoTxt})`));
+    else
+      filaIng(b.n,b.e,celdas(fn),`${b.n} — prueba ${fmt(b.ini)}–${fmt(b.fin)} (${estadoTxt})`);
+  });
+  if(filas.length===antesR) filas.length=marcaR;
+
+  html+=filas.join("");
+  inner.innerHTML=html;
+
+  const off=(HOY-INICIO)/86400000;
+  if(off>=0&&off<=DIAS_PLAN)
+    inner.insertAdjacentHTML("beforeend",`<div class="g-hoy" style="left:${190+Math.floor(off)*CW+CW/2}px"></div>`);
+}
+
+/* ---------- navegación ---------- */
+function mostrar(id){
+  document.querySelectorAll("section.vista").forEach(s=>s.classList.toggle("visible",s.id===id));
+  window.scrollTo({top:0});
+}
+function irMenu(cual){
+  ["dietas","recetas","ingredientes"].forEach(m=>
+    document.getElementById("m-"+m).classList.toggle("activo",m===cual));
+  if(cual==="dietas") mostrar("vDietas");
+  else if(cual==="recetas"){renderRecetas();mostrar("vRecetas")}
+  else if(cual==="ingredientes"){renderIngredientes();mostrar("vIngredientes")}
+}
+function verSubvista(v){
+  [["timeline","vTimelineWrap"],["gantt","vGanttWrap"],["general","vGeneralWrap"]].forEach(([id,wrap])=>{
+    document.getElementById("sn-"+id).classList.toggle("activo",v===id);
+    document.getElementById(wrap).style.display=v===id?"block":"none";
+  });
+  if(v==="gantt") renderGantt();
+}
+function imprimir(){window.print()}
+
+/* ---------- init ---------- */
+recalc(); renderDieta(); renderGeneral(); renderGantt(); renderDietas();
+</script>
+</body>
+</html>

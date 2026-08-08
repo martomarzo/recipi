@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# production
+build/
+
+# env files
+.env
+.env.local
+.env.*.local
+
+# uploads (use docker volume for persistence)
+public/uploads/
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
