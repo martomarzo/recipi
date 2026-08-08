@@ -29,12 +29,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-4 py-2.5">
             <a href="/" className="flex items-center gap-2.5">
               <Logo size={30} className="shrink-0" />
-              <span className="leading-tight">
-                <span className="font-display text-lg font-semibold">Recipi</span>
-                <small className="brand-spaced block text-[10.5px] font-bold text-salvia-osc">
-                  plan por fases
-                </small>
-              </span>
+              <span className="font-display text-lg font-semibold">Recipi</span>
             </a>
             {user && <NavMenu userName={user.name} />}
           </div>
