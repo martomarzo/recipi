@@ -60,3 +60,22 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
   return NextResponse.json({ ok: true });
 }
+
+// DELETE: elimina un usuario. Sus dietas (con fases/bloques/shares/tracking)
+// se borran en cascada; sus recetas quedan en el catálogo global (userId null).
+// No permite borrarse a uno mismo — así siempre queda al menos un usuario con
+// acceso (el registro es por invitación).
+export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  const user = await getSessionUser();
+  if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+
+  if (params.id === user.id) {
+    return NextResponse.json({ error: "No podés eliminar tu propio usuario." }, { status: 400 });
+  }
+
+  const target = await prisma.user.findUnique({ where: { id: params.id } });
+  if (!target) return NextResponse.json({ error: "Usuario no encontrado." }, { status: 404 });
+
+  await prisma.user.delete({ where: { id: params.id } });
+  return NextResponse.json({ ok: true });
+}

@@ -36,6 +36,8 @@ function EditarUsuario({
   const [email, setEmail] = useState(usuario.email);
   const [password, setPassword] = useState('');
   const [guardando, setGuardando] = useState(false);
+  const [confirmandoBorrar, setConfirmandoBorrar] = useState(false);
+  const [borrando, setBorrando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function guardar(e: React.FormEvent) {
@@ -58,6 +60,24 @@ function EditarUsuario({
       setError('No se pudo guardar.');
     } finally {
       setGuardando(false);
+    }
+  }
+
+  async function eliminar() {
+    setBorrando(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/usuarios/${usuario.id}`, { method: 'DELETE' });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError((data && typeof data.error === 'string' && data.error) || 'No se pudo eliminar.');
+        return;
+      }
+      onListo();
+    } catch {
+      setError('No se pudo eliminar.');
+    } finally {
+      setBorrando(false);
     }
   }
 
@@ -87,18 +107,42 @@ function EditarUsuario({
         minLength={8}
       />
       <div className="flex flex-wrap items-center gap-2 sm:col-span-3">
-        <button type="submit" disabled={guardando} className="btn-primario disabled:opacity-60">
+        <button type="submit" disabled={guardando || borrando} className="btn-primario disabled:opacity-60">
           {guardando ? 'Guardando…' : 'Guardar'}
         </button>
         <button type="button" onClick={onCancelar} className="btn">
           Cancelar
         </button>
+        {!esPropio && !confirmandoBorrar && (
+          <button
+            type="button"
+            onClick={() => setConfirmandoBorrar(true)}
+            className="btn text-mal sm:ml-auto"
+          >
+            Eliminar usuario
+          </button>
+        )}
         <span className="text-xs text-tinta-suave">
           {esPropio
             ? 'Si cambiás tu contraseña, seguís logueada acá; otros dispositivos se cierran.'
             : 'Cambiar la contraseña cierra las sesiones de ese usuario.'}
         </span>
       </div>
+      {confirmandoBorrar && !esPropio && (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-mal/40 bg-mal/5 p-3 text-sm sm:col-span-3">
+          <span className="w-full text-tinta">
+            Se eliminarán la cuenta y sus {usuario._count.diets}{' '}
+            {usuario._count.diets === 1 ? 'dieta' : 'dietas'} (incluidas las que haya compartido).
+            Sus recetas quedan en el catálogo compartido. Esto no se puede deshacer.
+          </span>
+          <button type="button" disabled={borrando} onClick={eliminar} className="btn text-mal disabled:opacity-60">
+            {borrando ? 'Eliminando…' : 'Sí, eliminar definitivamente'}
+          </button>
+          <button type="button" disabled={borrando} onClick={() => setConfirmandoBorrar(false)} className="btn">
+            No, conservar
+          </button>
+        </div>
+      )}
       {error && <p className="text-sm text-mal sm:col-span-3">{error}</p>}
     </form>
   );
