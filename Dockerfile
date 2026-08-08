@@ -1,10 +1,12 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
+RUN apk add --no-cache openssl
 COPY package.json package-lock.json* ./
 RUN npm ci
 
 FROM node:20-alpine AS builder
 WORKDIR /app
+RUN apk add --no-cache openssl
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV DATABASE_URL="file:/data/app.db"
@@ -18,7 +20,7 @@ ENV PORT=3000
 ENV DATABASE_URL="file:/data/app.db"
 
 # Chromium para el export a PDF (puppeteer-core lo usa vía esta ruta)
-RUN apk add --no-cache chromium font-noto ttf-liberation
+RUN apk add --no-cache openssl chromium font-noto ttf-liberation
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ENV UPLOADS_DIR=/data/uploads
 
