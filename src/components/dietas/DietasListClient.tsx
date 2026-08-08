@@ -13,6 +13,8 @@ export interface DietaListItem {
   endDate: string;
   isActive: boolean;
   archivado: boolean;
+  sharedRole: 'viewer' | 'editor' | null;
+  ownerName: string | null;
   weekColors: string[];
   totalBlocks: number;
   toleratedBlocks: number;
@@ -99,6 +101,14 @@ function DietaCard({ d }: { d: DietaListItem }) {
       {d.archivado && (
         <span className="mb-2 ml-2 inline-block rounded-full border border-linea bg-neutro-bg px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-tinta-suave">
           Archivada
+        </span>
+      )}
+      {d.sharedRole != null && (
+        <span
+          title={d.sharedRole === 'viewer' ? 'Solo lectura' : undefined}
+          className="mb-2 ml-2 inline-block rounded-full border border-linea bg-neutro-bg px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-tinta-suave"
+        >
+          Compartida · {d.ownerName}
         </span>
       )}
       <h3 className="font-display text-xl font-semibold">{d.name}</h3>

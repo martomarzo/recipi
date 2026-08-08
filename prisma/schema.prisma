@@ -20,6 +20,7 @@ model User {
   dishes       Dish[]
   sessions     Session[]
   invitations  Invitation[]
+  dietShares   DietShare[]
 }
 
 model Session {
@@ -92,7 +93,24 @@ model Diet {
   phases      Phase[]
   suggestions DishSuggestion[]
   tracking    TrackingEntry[]
+  shares      DietShare[]
 
+  @@index([userId])
+}
+
+// Dieta compartida con otro usuario, con rol por share:
+// viewer = solo lectura; editor = todo menos borrar/compartir (queda en el dueño).
+model DietShare {
+  id        String   @id @default(cuid())
+  dietId    String
+  userId    String // con quién se comparte
+  role      String // viewer | editor
+  createdAt DateTime @default(now())
+
+  diet Diet @relation(fields: [dietId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([dietId, userId])
   @@index([userId])
 }
 

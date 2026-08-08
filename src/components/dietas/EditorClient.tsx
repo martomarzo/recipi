@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { phaseClasses } from './phaseColors';
 import BlockEditor, { BlockDTO } from './BlockEditor';
+import DietShareForm, { UsuarioOption, ShareDTO } from './DietShareForm';
 
 export interface IngredientOption {
   id: number;
@@ -34,7 +35,17 @@ interface DietDTO {
   phases: PhaseDTO[];
 }
 
-export default function EditorClient({ dietInicial }: { dietInicial: DietDTO }) {
+export default function EditorClient({
+  dietInicial,
+  esDueno,
+  usuarios,
+  sharesIniciales,
+}: {
+  dietInicial: DietDTO;
+  esDueno: boolean;
+  usuarios: UsuarioOption[];
+  sharesIniciales: ShareDTO[];
+}) {
   const router = useRouter();
   const diet = dietInicial;
   const [ingredientes, setIngredientes] = useState<IngredientOption[]>([]);
@@ -66,7 +77,13 @@ export default function EditorClient({ dietInicial }: { dietInicial: DietDTO }) 
         cada fase y bloque.
       </p>
 
-      <DietFieldsForm diet={diet} onSaved={onChanged} />
+      <DietFieldsForm diet={diet} onSaved={onChanged} esDueno={esDueno} />
+
+      {esDueno && (
+        <div className="mt-5">
+          <DietShareForm dietId={diet.id} usuarios={usuarios} sharesIniciales={sharesIniciales} />
+        </div>
+      )}
 
       <div className="mt-8 space-y-6">
         {diet.phases.map((phase) => (
@@ -87,7 +104,15 @@ export default function EditorClient({ dietInicial }: { dietInicial: DietDTO }) 
   );
 }
 
-function DietFieldsForm({ diet, onSaved }: { diet: DietDTO; onSaved: () => void }) {
+function DietFieldsForm({
+  diet,
+  onSaved,
+  esDueno,
+}: {
+  diet: DietDTO;
+  onSaved: () => void;
+  esDueno: boolean;
+}) {
   const [name, setName] = useState(diet.name);
   const [description, setDescription] = useState(diet.description ?? '');
   const [isActive, setIsActive] = useState(diet.isActive);
@@ -101,10 +126,14 @@ function DietFieldsForm({ diet, onSaved }: { diet: DietDTO; onSaved: () => void 
 
   async function guardar() {
     setBusy(true);
+    const body: Record<string, unknown> = { name: name.trim(), description: description.trim() || null };
+    // isActive es exclusivo del dueño — si se manda igual (aunque sin cambios),
+    // la API rechaza el PATCH entero con 403 para un editor sin permiso.
+    if (esDueno) body.isActive = isActive;
     await fetch(`/api/dietas/${diet.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.trim(), description: description.trim() || null, isActive }),
+      body: JSON.stringify(body),
     });
     setBusy(false);
     onSaved();
@@ -131,23 +160,26 @@ function DietFieldsForm({ diet, onSaved }: { diet: DietDTO; onSaved: () => void 
         Descripción
         <textarea rows={3} className="input mt-1" value={description} onChange={(e) => setDescription(e.target.value)} />
       </label>
-      <label className="flex items-center gap-2 text-sm font-semibold">
-        <input type="checkbox" className="h-4 w-4" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
-        Dieta activa
-      </label>
+      {esDueno && (
+        <label className="flex items-center gap-2 text-sm font-semibold">
+          <input type="checkbox" className="h-4 w-4" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+          Dieta activa
+        </label>
+      )}
       <div className="flex flex-wrap items-center gap-2.5">
         <button type="button" disabled={busy} onClick={guardar} className="btn-primario disabled:opacity-60">
           {busy ? 'Guardando…' : 'Guardar cambios'}
         </button>
-        {diet.archivedAt ? (
-          <button type="button" disabled={busy} onClick={() => archivar(false)} className="btn disabled:opacity-60">
-            Desarchivar
-          </button>
-        ) : (
-          <button type="button" disabled={busy} onClick={() => archivar(true)} className="btn text-mal disabled:opacity-60">
-            Archivar dieta
-          </button>
-        )}
+        {esDueno &&
+          (diet.archivedAt ? (
+            <button type="button" disabled={busy} onClick={() => archivar(false)} className="btn disabled:opacity-60">
+              Desarchivar
+            </button>
+          ) : (
+            <button type="button" disabled={busy} onClick={() => archivar(true)} className="btn text-mal disabled:opacity-60">
+              Archivar dieta
+            </button>
+          ))}
       </div>
     </div>
   );

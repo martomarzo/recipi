@@ -20,6 +20,6 @@ App en producción (v1 completa, ver SPECS.md §12). UI 100 % en español; dise�
 
 - Motor de dominio: `src/lib/plan.ts` (computePlan/availability/requeue) + `src/lib/planData.ts` (loadDiet/loadActiveDiet, único punto de carga) + `src/lib/dates.ts` (ISO date-only).
 - Secciones: `src/app/dietas` (timeline, gantt en `/disponibilidad`, resumen+PDF en `/resumen`), `src/app/recetas` (import por link en `/importar`, pipeline en `src/lib/recetas/`), `src/app/ingredientes`.
-- Auth: `src/lib/auth.ts` (sesiones cookie + invitaciones); toda query de dietas se scopea al usuario (404 si ajena). Gestión de usuarios en `/usuarios` (alta directa + link de invitación, sin roles).
+- Auth: `src/lib/auth.ts` (sesiones cookie + invitaciones); dietas scopeadas por acceso en `src/lib/dietAccess.ts` — dueño o share `DietShare` (viewer/editor); sin acceso = 404. Gestión de usuarios en `/usuarios` (alta directa + edición + link de invitación, sin roles).
 - Semántica API: `PATCH /api/recetas/[id]` es full-replace; `DishSuggestion` solo con dietId = todo el plan; ingredientes globales, dishes con userId null = solo lectura.
 - Docker: no tocar sin leer los comentarios — openssl en cada stage, `HOSTNAME=0.0.0.0` en entrypoint, bcryptjs copiado a mano, sidecar tailscale comparte netns de la app.

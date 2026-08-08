@@ -98,6 +98,7 @@ export default async function DietaTimelinePage({ params }: { params: { id: stri
       suggestions={suggestions}
       trackingEntries={trackingEntries}
       tipsMdByBlock={tipsMdByBlock}
+      readOnly={loaded.role === 'viewer'}
     />
   );
 }

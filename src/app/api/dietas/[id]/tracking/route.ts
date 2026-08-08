@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionUser } from '@/lib/auth';
+import { editableDietsWhere, visibleDietsWhere } from '@/lib/dietAccess';
 
-// GET: notas recientes de seguimiento de la dieta.
+// GET: notas recientes de seguimiento de la dieta (cualquier acceso, incl. viewer).
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
 
-  const diet = await prisma.diet.findFirst({ where: { id: params.id, userId: user.id } });
+  const diet = await prisma.diet.findFirst({
+    where: { id: params.id, ...visibleDietsWhere(user.id) },
+  });
   if (!diet) return NextResponse.json({ error: 'No encontrada' }, { status: 404 });
 
   const { searchParams } = new URL(req.url);
@@ -21,12 +24,14 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   return NextResponse.json(entries);
 }
 
-// POST: nota rápida del día.
+// POST: nota rápida del día (dueño o editor).
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
 
-  const diet = await prisma.diet.findFirst({ where: { id: params.id, userId: user.id } });
+  const diet = await prisma.diet.findFirst({
+    where: { id: params.id, ...editableDietsWhere(user.id) },
+  });
   if (!diet) return NextResponse.json({ error: 'No encontrada' }, { status: 404 });
 
   const body = await req.json().catch(() => null);

@@ -37,11 +37,13 @@ function BlockCard({
   block,
   tipsMd,
   onChanged,
+  readOnly = false,
 }: {
   dietId: string;
   block: ComputedBlock;
   tipsMd: string | null;
   onChanged: () => void;
+  readOnly?: boolean;
 }) {
   const [note, setNote] = useState(block.statusNote ?? '');
   const [askingSintomas, setAskingSintomas] = useState(false);
@@ -81,55 +83,65 @@ function BlockCard({
         </span>
       </div>
       {tipsMd && <p className="mt-1.5 text-[13.5px] text-tinta-suave">{tipsMd}</p>}
-      <textarea
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        placeholder="Nota (opcional)"
-        rows={2}
-        className="input mt-2.5 text-[13px]"
-      />
-      <div className="mt-2.5 flex flex-wrap gap-2">
-        <button
-          type="button"
-          disabled={busy}
-          onClick={onTolerado}
-          className={`min-h-[38px] rounded-full border-[1.5px] px-3.5 text-[13px] font-semibold disabled:opacity-60 ${
-            block.status === 'tolerado' ? 'border-ok bg-ok text-white' : 'border-linea bg-crema'
-          }`}
-        >
-          ✓ Tolerado
-        </button>
-        <button
-          type="button"
-          disabled={busy}
-          onClick={onConSintomas}
-          className={`min-h-[38px] rounded-full border-[1.5px] px-3.5 text-[13px] font-semibold disabled:opacity-60 ${
-            block.status === 'con_sintomas' ? 'border-mal bg-mal text-white' : 'border-linea bg-crema'
-          }`}
-        >
-          ✕ Con síntomas
-        </button>
-      </div>
-      {askingSintomas && (
-        <div className="mt-2.5 flex flex-wrap items-center gap-2 rounded-lg bg-terra-bg p-2.5 text-[13px]">
-          <span className="w-full text-tinta-suave">¿Reintentar más adelante o seguir con el plan?</span>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => patch({ status: 'con_sintomas', statusNote: note || null, requeue: true })}
-            className="btn"
-          >
-            ↻ Reencolar al final
-          </button>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => patch({ status: 'con_sintomas', statusNote: note || null })}
-            className="btn"
-          >
-            Marcar y seguir
-          </button>
-        </div>
+      {readOnly ? (
+        block.statusNote && (
+          <p className="mt-2.5 whitespace-pre-wrap rounded-lg border border-linea bg-crema p-2.5 text-[13px] text-tinta-suave">
+            {block.statusNote}
+          </p>
+        )
+      ) : (
+        <>
+          <textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Nota (opcional)"
+            rows={2}
+            className="input mt-2.5 text-[13px]"
+          />
+          <div className="mt-2.5 flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onTolerado}
+              className={`min-h-[38px] rounded-full border-[1.5px] px-3.5 text-[13px] font-semibold disabled:opacity-60 ${
+                block.status === 'tolerado' ? 'border-ok bg-ok text-white' : 'border-linea bg-crema'
+              }`}
+            >
+              ✓ Tolerado
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onConSintomas}
+              className={`min-h-[38px] rounded-full border-[1.5px] px-3.5 text-[13px] font-semibold disabled:opacity-60 ${
+                block.status === 'con_sintomas' ? 'border-mal bg-mal text-white' : 'border-linea bg-crema'
+              }`}
+            >
+              ✕ Con síntomas
+            </button>
+          </div>
+          {askingSintomas && (
+            <div className="mt-2.5 flex flex-wrap items-center gap-2 rounded-lg bg-terra-bg p-2.5 text-[13px]">
+              <span className="w-full text-tinta-suave">¿Reintentar más adelante o seguir con el plan?</span>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => patch({ status: 'con_sintomas', statusNote: note || null, requeue: true })}
+                className="btn"
+              >
+                ↻ Reencolar al final
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => patch({ status: 'con_sintomas', statusNote: note || null })}
+                className="btn"
+              >
+                Marcar y seguir
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -145,6 +157,7 @@ export default function WeekDetailSheet({
   tipsMdByBlock,
   onClose,
   onChanged,
+  readOnly = false,
 }: {
   weekNum: number;
   plan: ComputedPlan;
@@ -155,6 +168,7 @@ export default function WeekDetailSheet({
   tipsMdByBlock: Record<string, string | null>;
   onClose: () => void;
   onChanged: () => void;
+  readOnly?: boolean;
 }) {
   const [visible, setVisible] = useState(false);
   const week = plan.weeks.find((w) => w.num === weekNum);
@@ -224,6 +238,7 @@ export default function WeekDetailSheet({
                   block={wb.block}
                   tipsMd={tipsMdByBlock[wb.block.id] ?? null}
                   onChanged={onChanged}
+                  readOnly={readOnly}
                 />
               ))}
             </div>

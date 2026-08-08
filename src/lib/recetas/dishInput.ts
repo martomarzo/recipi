@@ -1,6 +1,7 @@
 // Validación y normalización del body de POST/PATCH /api/recetas.
 
 import { prisma } from "@/lib/prisma";
+import { editableDietsWhere } from "@/lib/dietAccess";
 import { isMealType } from "./constants";
 
 export interface DishIngredientInput {
@@ -82,8 +83,9 @@ export async function parseDishInput(
   let suggestions: DishSuggestionInput[] = [];
   if (suggestionInputs.length > 0) {
     const dietIds = Array.from(new Set(suggestionInputs.map((s) => s.dietId)));
+    // Sugerencias solo hacia dietas donde el usuario escribe (dueño o editor).
     const ownedDiets = await prisma.diet.findMany({
-      where: { id: { in: dietIds }, userId },
+      where: { id: { in: dietIds }, ...editableDietsWhere(userId) },
       select: { id: true },
     });
     const ownedIds = new Set(ownedDiets.map((d) => d.id));

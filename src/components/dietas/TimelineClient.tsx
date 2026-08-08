@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { ComputedPlan, Week } from '@/lib/plan';
-import { diffDays, fmtLargo, rangoDdMm, todayISO } from '@/lib/dates';
+import { diffDays, fmtDdMmYyyy, fmtLargo, rangoDdMm, todayISO } from '@/lib/dates';
 import { phaseClasses } from './phaseColors';
 import WeekDetailSheet from './WeekDetailSheet';
 import RegistroDiario from './RegistroDiario';
@@ -76,6 +76,7 @@ export default function TimelineClient({
   suggestions,
   trackingEntries,
   tipsMdByBlock,
+  readOnly = false,
 }: {
   diet: DietDTO;
   plan: ComputedPlan;
@@ -84,6 +85,7 @@ export default function TimelineClient({
   suggestions: SuggestionItem[];
   trackingEntries: TrackingEntryDTO[];
   tipsMdByBlock: Record<string, string | null>;
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const [today, setToday] = useState<string | null>(null);
@@ -127,14 +129,18 @@ export default function TimelineClient({
           <label htmlFor="fechaInicio" className="font-bold">
             Inicio del plan:
           </label>
-          <input
-            id="fechaInicio"
-            type="date"
-            className="cursor-pointer border-none bg-transparent font-bold text-terra-osc outline-none disabled:opacity-60"
-            value={diet.startDate}
-            disabled={savingDate}
-            onChange={(e) => onChangeStartDate(e.target.value)}
-          />
+          {readOnly ? (
+            <span className="font-bold text-terra-osc">{fmtDdMmYyyy(diet.startDate)}</span>
+          ) : (
+            <input
+              id="fechaInicio"
+              type="date"
+              className="cursor-pointer border-none bg-transparent font-bold text-terra-osc outline-none disabled:opacity-60"
+              value={diet.startDate}
+              disabled={savingDate}
+              onChange={(e) => onChangeStartDate(e.target.value)}
+            />
+          )}
         </div>
 
         {today && (
@@ -168,12 +174,14 @@ export default function TimelineClient({
         >
           Vista general
         </Link>
-        <Link
-          href={`/dietas/${diet.id}/editar`}
-          className="flex min-h-[42px] items-center rounded-full border border-linea bg-white px-4 py-2 text-[13.5px] font-semibold text-tinta hover:border-tinta-suave"
-        >
-          ✎ Editar fases y bloques
-        </Link>
+        {!readOnly && (
+          <Link
+            href={`/dietas/${diet.id}/editar`}
+            className="flex min-h-[42px] items-center rounded-full border border-linea bg-white px-4 py-2 text-[13.5px] font-semibold text-tinta hover:border-tinta-suave"
+          >
+            ✎ Editar fases y bloques
+          </Link>
+        )}
       </div>
 
       <div className="mb-3.5 flex flex-wrap justify-center gap-3.5 text-[13px] text-tinta-suave">
@@ -238,7 +246,7 @@ export default function TimelineClient({
       </div>
 
       <div className="mt-8">
-        <RegistroDiario dietId={diet.id} entries={trackingEntries} today={today} />
+        <RegistroDiario dietId={diet.id} entries={trackingEntries} today={today} readOnly={readOnly} />
       </div>
 
       {openWeek != null && (
@@ -252,6 +260,7 @@ export default function TimelineClient({
           tipsMdByBlock={tipsMdByBlock}
           onClose={() => setOpenWeek(null)}
           onChanged={() => router.refresh()}
+          readOnly={readOnly}
         />
       )}
     </div>

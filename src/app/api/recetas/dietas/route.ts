@@ -2,17 +2,19 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/auth";
 import { dbDateToISO } from "@/lib/dates";
+import { editableDietsWhere } from "@/lib/dietAccess";
 import { computePlan, PhaseInput, PhaseType, BlockStatus } from "@/lib/plan";
 
-/** Dietas del usuario con sus fases y bloques — para el selector de
- * sugerencia (fase / bloque / semana) del constructor de recetas. No toca
- * src/app/api/dietas/**, que arma otro flujo en paralelo. */
+/** Dietas donde el usuario puede escribir (propias o compartidas como editor),
+ * con sus fases y bloques — para el selector de sugerencia (fase / bloque /
+ * semana) del constructor de recetas. No toca src/app/api/dietas/**, que arma
+ * otro flujo en paralelo. */
 export async function GET() {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const diets = await prisma.diet.findMany({
-    where: { userId: user.id, archivedAt: null },
+    where: { archivedAt: null, ...editableDietsWhere(user.id) },
     orderBy: { createdAt: "desc" },
     include: {
       phases: {

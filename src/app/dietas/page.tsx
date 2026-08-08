@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getSessionUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { visibleDietsWhere } from '@/lib/dietAccess';
 import { dbDateToISO } from '@/lib/dates';
 import { computePlan, PhaseInput } from '@/lib/plan';
 import DietasListClient, { DietaListItem, DietaOption } from '@/components/dietas/DietasListClient';
@@ -36,9 +37,12 @@ export default async function DietasPage() {
   const user = await getSessionUser();
   if (!user) redirect('/login');
 
+  // Propias + compartidas conmigo (el share aporta rol y nombre del dueño).
   const diets = await prisma.diet.findMany({
-    where: { userId: user.id },
+    where: visibleDietsWhere(user.id),
     include: {
+      user: { select: { name: true } },
+      shares: { where: { userId: user.id }, select: { role: true } },
       phases: {
         orderBy: { sort: 'asc' },
         include: { blocks: { orderBy: { sort: 'asc' } } },
@@ -51,6 +55,7 @@ export default async function DietasPage() {
     const plan = computePlan(dbDateToISO(d.startDate), toPhaseInput(d.phases));
     const totalBlocks = plan.blocks.length;
     const tolerated = plan.blocks.filter((b) => b.status === 'tolerado').length;
+    const propia = d.userId === user.id;
     return {
       id: d.id,
       name: d.name,
@@ -58,6 +63,8 @@ export default async function DietasPage() {
       endDate: plan.endDate,
       isActive: d.isActive,
       archivado: d.archivedAt != null,
+      sharedRole: propia ? null : d.shares[0]?.role === 'editor' ? ('editor' as const) : ('viewer' as const),
+      ownerName: propia ? null : d.user.name,
       weekColors: plan.weeks.map((w) => w.phase.color),
       totalBlocks,
       toleratedBlocks: tolerated,

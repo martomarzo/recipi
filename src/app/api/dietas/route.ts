@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionUser } from '@/lib/auth';
+import { visibleDietsWhere } from '@/lib/dietAccess';
 import { dbDateToISO } from '@/lib/dates';
 import { computePlan, PhaseInput } from '@/lib/plan';
 
@@ -31,14 +32,17 @@ function toPhaseInput(phases: Array<{
   }));
 }
 
-// GET: lista de dietas del usuario, con fases/bloques para mini-banda y progreso.
+// GET: lista de dietas visibles (propias + compartidas conmigo), con
+// fases/bloques para mini-banda y progreso.
 export async function GET() {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
 
   const diets = await prisma.diet.findMany({
-    where: { userId: user.id },
+    where: visibleDietsWhere(user.id),
     include: {
+      user: { select: { name: true } },
+      shares: { where: { userId: user.id }, select: { role: true } },
       phases: {
         orderBy: { sort: 'asc' },
         include: { blocks: { orderBy: { sort: 'asc' } } },
@@ -51,6 +55,7 @@ export async function GET() {
     const plan = computePlan(dbDateToISO(d.startDate), toPhaseInput(d.phases));
     const totalBlocks = plan.blocks.length;
     const tolerated = plan.blocks.filter((b) => b.status === 'tolerado').length;
+    const propia = d.userId === user.id;
     return {
       id: d.id,
       name: d.name,
@@ -58,6 +63,9 @@ export async function GET() {
       startDate: dbDateToISO(d.startDate),
       isActive: d.isActive,
       archivedAt: d.archivedAt,
+      // null = propia; si es compartida, rol del share y nombre del dueño.
+      sharedRole: propia ? null : d.shares[0]?.role ?? 'viewer',
+      ownerName: propia ? null : d.user.name,
       weeks: plan.weeks.map((w) => ({ num: w.num, color: w.phase.color, phaseName: w.phase.name })),
       endDate: plan.endDate,
       totalBlocks,
@@ -68,7 +76,8 @@ export async function GET() {
   return NextResponse.json(result);
 }
 
-// POST: crea una dieta nueva, opcionalmente duplicando otra existente del mismo usuario.
+// POST: crea una dieta nueva, opcionalmente duplicando otra visible para el
+// usuario (propia o compartida — la copia queda siempre a nombre de quien duplica).
 export async function POST(req: NextRequest) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
@@ -200,7 +209,7 @@ export async function POST(req: NextRequest) {
 
 function loadSource(id: string, userId: string) {
   return prisma.diet.findFirst({
-    where: { id, userId },
+    where: { id, ...visibleDietsWhere(userId) },
     include: {
       phases: {
         orderBy: { sort: 'asc' },

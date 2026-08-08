@@ -143,12 +143,14 @@ export default async function ResumenPage({ params }: { params: { id: string } }
         <span className="inline-flex min-h-[42px] items-center rounded-full border border-salvia-osc bg-salvia-osc px-4 py-2 text-[13.5px] font-semibold text-crema">
           Vista general
         </span>
-        <Link
-          href={`/dietas/${diet.id}/editar`}
-          className="flex min-h-[42px] items-center rounded-full border border-linea bg-white px-4 py-2 text-[13.5px] font-semibold text-tinta hover:border-tinta-suave"
-        >
-          ✎ Editar fases y bloques
-        </Link>
+        {loaded.role !== 'viewer' && (
+          <Link
+            href={`/dietas/${diet.id}/editar`}
+            className="flex min-h-[42px] items-center rounded-full border border-linea bg-white px-4 py-2 text-[13.5px] font-semibold text-tinta hover:border-tinta-suave"
+          >
+            ✎ Editar fases y bloques
+          </Link>
+        )}
       </div>
 
       <ResumenToolbar dietId={diet.id} />

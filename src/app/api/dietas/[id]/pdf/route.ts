@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { visibleDietsWhere } from '@/lib/dietAccess';
 import { findChromiumExecutable, renderUrlToPdf, ChromiumNotFoundError } from '@/lib/pdf';
 
 const NO_CHROMIUM_MESSAGE = 'Export a PDF no disponible en este servidor — usá Imprimir';
 
 // GET: renderiza /dietas/:id/resumen a PDF server-side (§6 SPECS.md) y lo
-// devuelve como descarga. Requiere sesión + ser dueño de la dieta, igual que
-// el resto de las rutas de /api/dietas/:id/*.
+// devuelve como descarga. Requiere sesión + acceso a la dieta (dueño o share,
+// incluso viewer: el PDF es lectura); el render reenvía la cookie del caller.
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
 
   const diet = await prisma.diet.findFirst({
-    where: { id: params.id, userId: user.id },
+    where: { id: params.id, ...visibleDietsWhere(user.id) },
     select: { id: true },
   });
   if (!diet) return NextResponse.json({ error: 'No encontrada' }, { status: 404 });

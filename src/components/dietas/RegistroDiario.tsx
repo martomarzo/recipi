@@ -9,10 +9,12 @@ export default function RegistroDiario({
   dietId,
   entries,
   today,
+  readOnly = false,
 }: {
   dietId: string;
   entries: TrackingEntryDTO[];
   today: string | null;
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const [note, setNote] = useState('');
@@ -37,6 +39,26 @@ export default function RegistroDiario({
       setError(data.error ?? 'No se pudo guardar la nota.');
     }
     setBusy(false);
+  }
+
+  if (readOnly) {
+    return (
+      <div className="card p-4">
+        <h3 className="mb-2 font-display text-lg font-semibold">Notas registradas</h3>
+        {entries.length === 0 ? (
+          <p className="text-[13.5px] text-tinta-suave">Todavía no hay notas registradas.</p>
+        ) : (
+          <ul className="space-y-2 text-[13.5px]">
+            {entries.map((e) => (
+              <li key={e.id} className="rounded-lg border border-linea bg-white p-2.5">
+                <div className="mb-0.5 text-xs font-bold text-tinta-suave">{fmtDdMmYyyy(e.date)}</div>
+                <div className="whitespace-pre-wrap">{e.noteMd}</div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
   }
 
   return (

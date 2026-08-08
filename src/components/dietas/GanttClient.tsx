@@ -17,7 +17,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { ComputedPlan } from '@/lib/plan';
 import { ingredientAvailability } from '@/lib/plan';
-import { diffDays, fmtDdMm, rangoDdMm, todayISO } from '@/lib/dates';
+import { diffDays, fmtDdMm, fmtDdMmYyyy, rangoDdMm, todayISO } from '@/lib/dates';
 import { phaseClasses } from './phaseColors';
 
 export interface GanttRow {
@@ -107,11 +107,13 @@ export default function GanttClient({
   plan,
   baseIds,
   groups,
+  readOnly = false,
 }: {
   diet: GanttDietDTO;
   plan: ComputedPlan;
   baseIds: number[];
   groups: GanttGroup[];
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const [today, setToday] = useState<string | null>(null);
@@ -172,14 +174,18 @@ export default function GanttClient({
           <label htmlFor="fechaInicioGantt" className="font-bold">
             Inicio del plan:
           </label>
-          <input
-            id="fechaInicioGantt"
-            type="date"
-            className="cursor-pointer border-none bg-transparent font-bold text-terra-osc outline-none disabled:opacity-60"
-            value={diet.startDate}
-            disabled={savingDate}
-            onChange={(e) => onChangeStartDate(e.target.value)}
-          />
+          {readOnly ? (
+            <span className="font-bold text-terra-osc">{fmtDdMmYyyy(diet.startDate)}</span>
+          ) : (
+            <input
+              id="fechaInicioGantt"
+              type="date"
+              className="cursor-pointer border-none bg-transparent font-bold text-terra-osc outline-none disabled:opacity-60"
+              value={diet.startDate}
+              disabled={savingDate}
+              onChange={(e) => onChangeStartDate(e.target.value)}
+            />
+          )}
         </div>
       </div>
 
@@ -202,12 +208,14 @@ export default function GanttClient({
         >
           Vista general
         </Link>
-        <Link
-          href={`/dietas/${diet.id}/editar`}
-          className="flex min-h-[42px] items-center rounded-full border border-linea bg-white px-4 py-2 text-[13.5px] font-semibold text-tinta hover:border-tinta-suave"
-        >
-          ✎ Editar fases y bloques
-        </Link>
+        {!readOnly && (
+          <Link
+            href={`/dietas/${diet.id}/editar`}
+            className="flex min-h-[42px] items-center rounded-full border border-linea bg-white px-4 py-2 text-[13.5px] font-semibold text-tinta hover:border-tinta-suave"
+          >
+            ✎ Editar fases y bloques
+          </Link>
+        )}
       </div>
 
       <div className="mb-1 text-center">

@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionUser } from '@/lib/auth';
+import { editableDietsWhere } from '@/lib/dietAccess';
 import { requeueSorts } from '@/lib/plan';
 
+// Bloque escribible por el usuario: dueño de la dieta o share con rol editor.
 async function ownedBlock(dietId: string, blockId: string, userId: string) {
   const block = await prisma.reintroBlock.findFirst({
-    where: { id: blockId, phase: { dietId, diet: { userId } } },
+    where: { id: blockId, phase: { dietId, diet: editableDietsWhere(userId) } },
     include: { phase: true },
   });
   return block;

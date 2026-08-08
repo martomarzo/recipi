@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionUser } from '@/lib/auth';
+import { editableDietsWhere } from '@/lib/dietAccess';
 
-// POST: agrega un bloque de reintroducción a una fase de la dieta.
+// POST: agrega un bloque de reintroducción a una fase de la dieta (dueño o editor).
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
 
-  const diet = await prisma.diet.findFirst({ where: { id: params.id, userId: user.id } });
+  const diet = await prisma.diet.findFirst({
+    where: { id: params.id, ...editableDietsWhere(user.id) },
+  });
   if (!diet) return NextResponse.json({ error: 'No encontrada' }, { status: 404 });
 
   const body = await req.json().catch(() => null);

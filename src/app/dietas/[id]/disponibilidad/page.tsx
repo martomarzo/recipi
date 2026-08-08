@@ -63,6 +63,12 @@ export default async function DietaDisponibilidadPage({ params }: { params: { id
   };
 
   return (
-    <GanttClient diet={dietDTO} plan={plan} baseIds={Array.from(baseIds)} groups={groups} />
+    <GanttClient
+      diet={dietDTO}
+      plan={plan}
+      baseIds={Array.from(baseIds)}
+      groups={groups}
+      readOnly={loaded.role === 'viewer'}
+    />
   );
 }

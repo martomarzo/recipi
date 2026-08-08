@@ -5,6 +5,7 @@
 
 import { prisma } from "./prisma";
 import { dbDateToISO } from "./dates";
+import { DietRole, visibleDietsWhere } from "./dietAccess";
 import { computePlan, ComputedPlan, PhaseInput, BlockStatus, PhaseType } from "./plan";
 
 export interface LoadedDiet {
@@ -17,6 +18,8 @@ export interface LoadedDiet {
     isActive: boolean;
     archivedAt: Date | null;
   };
+  /** Rol de quien carga: owner | editor | viewer (los views ocultan edición). */
+  role: DietRole;
   plan: ComputedPlan;
   /** Ingredientes "base segura": reglas permitido expandidas por categoría. */
   baseIds: Set<number>;
@@ -27,9 +30,11 @@ export interface LoadedDiet {
 type DietWithPhases = NonNullable<Awaited<ReturnType<typeof fetchDiet>>>;
 
 function fetchDiet(dietId: string, userId: string) {
+  // Visible para el dueño o para quien tenga un share (viewer/editor).
   return prisma.diet.findFirst({
-    where: { id: dietId, userId },
+    where: { id: dietId, ...visibleDietsWhere(userId) },
     include: {
+      shares: { where: { userId }, select: { role: true } },
       phases: {
         orderBy: { sort: "asc" },
         include: {
@@ -44,7 +49,9 @@ function fetchDiet(dietId: string, userId: string) {
 export async function loadDiet(dietId: string, userId: string): Promise<LoadedDiet | null> {
   const diet = await fetchDiet(dietId, userId);
   if (!diet) return null;
-  return buildLoadedDiet(diet);
+  const role: DietRole =
+    diet.userId === userId ? "owner" : diet.shares[0]?.role === "editor" ? "editor" : "viewer";
+  return buildLoadedDiet(diet, role);
 }
 
 /** Dieta activa del usuario (para disponibilidad en Recetas); null si no hay. */
@@ -58,7 +65,7 @@ export async function loadActiveDiet(userId: string): Promise<LoadedDiet | null>
   return loadDiet(active.id, userId);
 }
 
-async function buildLoadedDiet(diet: DietWithPhases): Promise<LoadedDiet> {
+async function buildLoadedDiet(diet: DietWithPhases, role: DietRole): Promise<LoadedDiet> {
   const phasesIn: PhaseInput[] = diet.phases.map((p) => ({
     id: p.id,
     name: p.name,
@@ -117,6 +124,7 @@ async function buildLoadedDiet(diet: DietWithPhases): Promise<LoadedDiet> {
       isActive: diet.isActive,
       archivedAt: diet.archivedAt,
     },
+    role,
     plan,
     baseIds,
     reintroIds,

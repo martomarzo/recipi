@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionUser } from '@/lib/auth';
+import { editableDietsWhere } from '@/lib/dietAccess';
 
-// PATCH: editar nombre/duración de una fase (usado desde el editor de fases y bloques).
+// PATCH: editar nombre/duración de una fase (usado desde el editor de fases y
+// bloques). Dueño o editor (share).
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string; phaseId: string } }
@@ -11,7 +13,7 @@ export async function PATCH(
   if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
 
   const phase = await prisma.phase.findFirst({
-    where: { id: params.phaseId, dietId: params.id, diet: { userId: user.id } },
+    where: { id: params.phaseId, dietId: params.id, diet: editableDietsWhere(user.id) },
   });
   if (!phase) return NextResponse.json({ error: 'No encontrada' }, { status: 404 });
 
