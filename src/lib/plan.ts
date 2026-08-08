@@ -100,8 +100,9 @@ export function computePlan(startDate: ISODate, phasesIn: PhaseInput[]): Compute
   }
 
   const totalDays = cursor;
-  const endDate = addDays(startDate, totalDays - 1);
-  const numWeeks = Math.max(1, Math.ceil(totalDays / 7));
+  const endDate = addDays(startDate, Math.max(0, totalDays - 1));
+  // Sin fases no hay semanas (evita week.phase === undefined río abajo).
+  const numWeeks = phases.length === 0 ? 0 : Math.max(1, Math.ceil(totalDays / 7));
 
   const weeks: Week[] = [];
   for (let i = 0; i < numWeeks; i++) {

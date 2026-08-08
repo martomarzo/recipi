@@ -7,6 +7,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ENV DATABASE_URL="file:/data/app.db"
 RUN npx prisma generate
 RUN npm run build
 
@@ -14,17 +15,29 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV DATABASE_URL="file:/data/app.db"
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Chromium para el export a PDF (puppeteer-core lo usa vía esta ruta)
+RUN apk add --no-cache chromium font-noto ttf-liberation
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-RUN mkdir -p public/uploads && chown -R nextjs:nodejs public/uploads
+# Prisma CLI + esquema para correr migraciones al arrancar
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/.bin ./node_modules/.bin
+COPY docker-entrypoint.sh ./docker-entrypoint.sh
+
+RUN mkdir -p /data && chown -R nextjs:nodejs /data /app/public && chmod +x docker-entrypoint.sh
 
 USER nextjs
 EXPOSE 3000
+VOLUME ["/data"]
 
-CMD ["node", "server.js"]
+ENTRYPOINT ["./docker-entrypoint.sh"]

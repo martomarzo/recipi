@@ -18,10 +18,16 @@ export async function createSession(userId: string) {
   const token = randomBytes(32).toString("hex");
   const expiresAt = new Date(Date.now() + SESSION_DAYS * 86400000);
   await prisma.session.create({ data: { id: token, userId, expiresAt } });
+  // COOKIE_SECURE=false permite login por HTTP plano en la LAN (sin TLS);
+  // por defecto la cookie es Secure en producción (acceso HTTPS vía tailnet).
+  const secure =
+    process.env.COOKIE_SECURE != null && process.env.COOKIE_SECURE !== ""
+      ? process.env.COOKIE_SECURE === "true"
+      : process.env.NODE_ENV === "production";
   cookies().set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure,
     path: "/",
     maxAge: SESSION_DAYS * 86400,
   });

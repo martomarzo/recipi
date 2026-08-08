@@ -1,12 +1,14 @@
 import type { Metadata, Viewport } from 'next';
 import { getSessionUser } from '@/lib/auth';
 import NavMenu from '@/components/NavMenu';
+import PWA from '@/components/PWA';
 import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Protocolo',
   description: 'Planes de alimentación por fases',
   manifest: '/manifest.webmanifest',
+  icons: { apple: '/iconos/apple-touch-icon.png' },
 };
 
 export const viewport: Viewport = {
@@ -34,6 +36,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         </header>
         <main className="mx-auto max-w-5xl px-4 pb-20 pt-6">{children}</main>
+        <PWA />
       </body>
     </html>
   );

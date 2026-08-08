@@ -17,50 +17,44 @@ export default function StepTimer({ label, initialSeconds }: StepTimerProps) {
 
   return (
     <div
-      className={`mt-3 rounded-lg border p-3 ${
-        isDone
-          ? 'border-green-300 bg-green-50'
-          : 'border-amber-200 bg-amber-50'
+      className={`mt-3 rounded-xl border p-3 ${
+        isDone ? 'border-salvia bg-salvia-bg' : 'border-terra bg-terra-bg'
       }`}
     >
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-gray-500 truncate">{label}</p>
+          <p className="truncate text-xs text-tinta-suave">{label}</p>
           <p
-            className={`text-2xl font-mono font-bold tabular-nums ${
-              isDone ? 'text-green-600' : 'text-amber-700'
+            className={`font-mono text-2xl font-bold tabular-nums ${
+              isDone ? 'text-salvia-osc' : 'text-terra-osc'
             }`}
           >
-            {isDone ? 'Done!' : formatTime(remaining)}
+            {isDone ? '¡Listo!' : formatTime(remaining)}
           </p>
-          <div className="mt-1 h-1.5 w-full rounded-full bg-amber-200">
+          <div className="mt-1 h-1.5 w-full rounded-full bg-white/70">
             <div
               className={`h-full rounded-full transition-all duration-1000 ${
-                isDone ? 'bg-green-500' : 'bg-amber-500'
+                isDone ? 'bg-salvia' : 'bg-terra'
               }`}
               style={{ width: `${isDone ? 100 : progress}%` }}
             />
           </div>
         </div>
 
-        <div className="flex gap-2 shrink-0">
+        <div className="flex shrink-0 gap-2">
           {!isDone && (
             <button
               onClick={isRunning ? pause : start}
-              className={`rounded-md px-3 py-1.5 text-sm font-medium text-white transition-colors ${
-                isRunning
-                  ? 'bg-amber-500 hover:bg-amber-600'
-                  : 'bg-amber-600 hover:bg-amber-700'
-              }`}
+              className="min-h-[38px] rounded-full bg-tinta px-3 py-1.5 text-sm font-semibold text-crema transition-colors hover:bg-tinta/90"
             >
-              {isRunning ? 'Pause' : status === 'paused' ? 'Resume' : 'Start'}
+              {isRunning ? 'Pausar' : status === 'paused' ? 'Seguir' : 'Iniciar'}
             </button>
           )}
           <button
             onClick={reset}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+            className="min-h-[38px] rounded-full border border-linea bg-white px-3 py-1.5 text-sm font-medium text-tinta-suave transition-colors hover:border-tinta-suave"
           >
-            Reset
+            Reiniciar
           </button>
         </div>
       </div>
