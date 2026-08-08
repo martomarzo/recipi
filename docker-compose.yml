@@ -1,29 +1,9 @@
 services:
-  # Sidecar de Tailscale: publica la app en el tailnet con HTTPS
-  # (https://recipi.<tailnet>.ts.net) vía `tailscale serve`, sin reverse
-  # proxy propio. Necesita TS_AUTHKEY en .env la primera vez; el estado
-  # queda en ./data/tailscale.
-  tailscale:
-    image: tailscale/tailscale:latest
-    hostname: recipi
-    environment:
-      - TS_AUTHKEY=${TS_AUTHKEY:-}
-      - TS_STATE_DIR=/var/lib/tailscale
-      - TS_SERVE_CONFIG=/config/serve.json
-    volumes:
-      - ./data/tailscale:/var/lib/tailscale
-      - ./tailscale/serve.json:/config/serve.json:ro
-    ports:
-      # Acceso directo por LAN (http://IP:3000) además del tailnet
-      - "${PORT:-3000}:3000"
-    restart: unless-stopped
-
   app:
     build: .
-    # Comparte red con el sidecar: `tailscale serve` proxya a 127.0.0.1:3000
-    network_mode: service:tailscale
-    depends_on:
-      - tailscale
+    ports:
+      # Acceso directo por LAN (http://IP:3000)
+      - "${PORT:-3000}:3000"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=file:/data/app.db
@@ -34,4 +14,24 @@ services:
       - COOKIE_SECURE=${COOKIE_SECURE:-}
     volumes:
       - ./data:/data
+    restart: unless-stopped
+
+  # Sidecar de Tailscale: comparte la red de la app y la publica en el
+  # tailnet con HTTPS (https://recipi.<tailnet>.ts.net) vía `tailscale
+  # serve`. Autenticación: TS_AUTHKEY en .env, o abrir una vez el link
+  # que aparece en `docker compose logs tailscale`. Si el sidecar cae,
+  # el acceso por LAN no se ve afectado.
+  tailscale:
+    image: tailscale/tailscale:latest
+    network_mode: service:app
+    depends_on:
+      - app
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY:-}
+      - TS_HOSTNAME=recipi
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - ./data/tailscale:/var/lib/tailscale
+      - ./tailscale/serve.json:/config/serve.json:ro
     restart: unless-stopped
