@@ -7,6 +7,7 @@ const ITEMS = [
   { href: '/', label: 'Dietas', match: (p: string) => p === '/' || p.startsWith('/dietas') },
   { href: '/recetas', label: 'Recetas', match: (p: string) => p.startsWith('/recetas') },
   { href: '/ingredientes', label: 'Ingredientes', match: (p: string) => p.startsWith('/ingredientes') },
+  { href: '/usuarios', label: 'Usuarios', match: (p: string) => p.startsWith('/usuarios') },
 ];
 
 export default function NavMenu({ userName }: { userName: string }) {

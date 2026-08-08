@@ -1,4 +1,4 @@
-# Spec — App de Planes de Alimentación por Fases ("Protocolo")
+# Spec — App de Planes de Alimentación por Fases ("Recipi")
 
 **Documento para implementación con Claude Code.**
 Versión 1.2 — 08/08/2026 — Autora: Marto
@@ -292,3 +292,25 @@ El catálogo completo de ~64 ingredientes con sus valores nutricionales aproxima
 ### A.6 Extra opcional (v1.1): rutinas de biorritmo
 
 El protocolo incluye dos rutinas de día (post-guardia / día normal) con horarios de melatonina, luz solar, ejercicio y cena temprana. No son parte del timeline de alimentos; si se implementa, mostrarlas como página estática de referencia dentro del plan.
+
+---
+
+## 12. Estado de implementación (08/08/2026)
+
+**v1 completa y en producción.** Stack elegido: Next.js 14 (App Router) + TypeScript + Tailwind + Prisma 5 + SQLite. Deploy según §9.1: `https://recipi.peacock-snapper.ts.net` (tailnet) / `http://containers:3000` (LAN), con CD por systemd timer (push a `main` → deploy automático en ~3–5 min).
+
+**Verificación**: los 17 criterios de §11 pasados el 08/08/2026 (fechas del seed exactas al Apéndice A; macros al gramo; aislamiento entre usuarios; PDF de 2 páginas). Pendiente de verificación humana: PWA offline en el celular y QA visual contra el prototipo.
+
+**Decisiones de implementación** (complementan §2, no reabrir sin motivo):
+- Ninguna fecha de fase/bloque se persiste: todo deriva de `startDate` + duraciones (`src/lib/plan.ts`); la fase de reintroducción dura la suma de sus bloques; reencolar = reordenar `sort`.
+- §10 decía "sin cálculo nutricional" — línea obsoleta: los macros SÍ están (exigidos por §3.1/§4.4/criterio 11). El catálogo real es de 62 ingredientes (el "~64" era aproximado).
+- "A evitar" del seed: filas de `phase_ingredient_rules` con ambos FK null y el texto en `note` (markdown).
+- `dish_suggestions` con solo `diet_id` = "válido todo el plan"; `week_number` rinde chip "S{N}" y ordena primero en esa semana.
+- Recetas: `PATCH` es reemplazo completo (herencia de Recipi). Importación por link: JSON-LD de schema.org → parser Claude (`ANTHROPIC_API_KEY`) → parser regex; líneas sin mapear quedan en `parsed_json`.
+- Imágenes subidas en `data/uploads` (servidas por route handler, no `public/`); `data/` concentra TODO lo persistente (SQLite, uploads, estado tailscale).
+- Extra heredado de Recipi (fuera de spec, requerido por Marto): importar recetas por link/texto + timers interactivos en los pasos.
+- A.6 (rutinas de biorritmo) no implementado.
+- App renombrada a **"Recipi"** (08/08/2026, pedido de Marto): wordmark, manifest PWA, cookie de sesión (`recipi_session`), nombre del PDF. La marca original de Recipi (tenedor + cuchara sobre ámbar `#D97706`) vuelve como logo del header (`src/components/Logo.tsx`), favicon (`src/app/icon.tsx`) e iconos PWA. El nombre del plan seed ("Protocolo Intestinal") no cambia.
+- Gestión de usuarios en `/usuarios` (extra sobre §7, sin roles): cualquier usuario logueado puede crear otro directamente (nombre/email/contraseña vía `POST /api/usuarios`) o generar un link de invitación (UI para `/api/auth/invite`).
+
+**Cuentas**: seed crea `demo@protocolo.local` / `protocolo123` si no hay usuarios (cambiar la contraseña). Registro por invitación (`REGISTRATION_OPEN=false` en producción).
