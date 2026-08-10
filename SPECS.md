@@ -162,8 +162,8 @@ Tercera sub-vista de una dieta, junto a Timeline y Vista general (**prototipada 
 ### 9.1 Entorno de despliegue inicial (infra propia)
 
 - **Host**: servidor local — VM en Proxmox que corre Docker.
-- **Acceso**: `ssh root@containers` (Tailscale SSH; la ACL usa check mode — puede pedir re-autenticación en el navegador).
-- **Layout en el servidor**: una carpeta dedicada para la app (p. ej. `~/recipi/`) que contiene el código (clone de `https://github.com/martomarzo/recipi.git`) y, dentro, el volumen de datos `./data/` (SQLite `app.db` + `uploads/`). Backup = copiar la carpeta `data/`.
+- **Acceso**: `ssh root@docker` (Tailscale SSH; la ACL usa check mode — puede pedir re-autenticación en el navegador).
+- **Layout en el servidor**: una carpeta dedicada para la app (`/root/containers/recipi/`) que contiene el código (clone de `https://github.com/martomarzo/recipi.git`) y, dentro, el volumen de datos `./data/` (SQLite `app.db` + `uploads/`). Backup = copiar la carpeta `data/`.
 - **Flujo de deploy**: `git pull` + `docker compose up -d --build` dentro de esa carpeta; el seed se corre una sola vez con `docker compose exec app npm run seed` (o equivalente).
 - **HTTPS**: dentro de la LAN puede ir en HTTP; si se expone hacia afuera, detrás de un reverse proxy con TLS (ver §2).
 - **Tailscale**: el `docker-compose.yml` incluye un **sidecar de Tailscale** (`tailscale/tailscale`) que publica la app en el tailnet con HTTPS vía `tailscale serve` (`https://recipi.<tailnet>.ts.net`), sin reverse proxy propio. Config en `tailscale/serve.json`; requiere `TS_AUTHKEY` en `.env` la primera vez (estado persistido en `./data/tailscale`). El acceso por LAN sigue disponible en `http://IP:3000` (para login por HTTP plano poner `COOKIE_SECURE=false`).
@@ -297,7 +297,7 @@ El protocolo incluye dos rutinas de día (post-guardia / día normal) con horari
 
 ## 12. Estado de implementación (08/08/2026)
 
-**v1 completa y en producción.** Stack elegido: Next.js 14 (App Router) + TypeScript + Tailwind + Prisma 5 + SQLite. Deploy según §9.1: `https://recipi.peacock-snapper.ts.net` (tailnet) / `http://containers:3000` (LAN), con CD por systemd timer (push a `main` → deploy automático en ~3–5 min).
+**v1 completa y en producción.** Stack elegido: Next.js 14 (App Router) + TypeScript + Tailwind + Prisma 5 + SQLite. Deploy según §9.1: `https://recipi.peacock-snapper.ts.net` (tailnet) / `http://docker:3000` (LAN), con CD por systemd timer (push a `main` → deploy automático en ~3–5 min).
 
 **Verificación**: los 17 criterios de §11 pasados el 08/08/2026 (fechas del seed exactas al Apéndice A; macros al gramo; aislamiento entre usuarios; PDF de 2 páginas). Pendiente de verificación humana: PWA offline en el celular y QA visual contra el prototipo.
 

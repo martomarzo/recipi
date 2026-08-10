@@ -5,4 +5,4 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/root/recipi/deploy/deploy.sh
+ExecStart=/root/containers/recipi/deploy/deploy.sh

@@ -3,7 +3,7 @@
 # si hay commits nuevos en origin/main, rebuildea y relanza el stack.
 set -e
 
-REPO_DIR="${REPO_DIR:-/root/recipi}"
+REPO_DIR="${REPO_DIR:-/root/containers/recipi}"
 cd "$REPO_DIR"
 
 # Evitar deploys solapados

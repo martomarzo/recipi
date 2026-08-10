@@ -6,7 +6,7 @@ App en producción (v1 completa, ver SPECS.md §12). UI 100 % en español; dise�
 
 - `npm run dev` / `npm run build` / `npx tsc --noEmit` (validar siempre antes de commitear)
 - `npm run seed` — idempotente; `npx prisma migrate dev` para cambios de schema
-- Deploy = **pushear a `main`**: el servidor (`root@containers`, carpeta `/root/recipi`) tiene un systemd timer que hace pull + rebuild solo. Logs: `journalctl -u recipi-deploy.service`.
+- Deploy = **pushear a `main`**: el servidor (`root@docker`, carpeta `/root/containers/recipi`) tiene un systemd timer que hace pull + rebuild solo. Logs: `journalctl -u recipi-deploy.service`.
 
 ## Reglas duras
 
