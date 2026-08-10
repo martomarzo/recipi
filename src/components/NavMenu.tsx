@@ -21,7 +21,7 @@ export default function NavMenu({ userName }: { userName: string }) {
   }
 
   return (
-    <nav className="flex items-center gap-2">
+    <nav className="flex flex-wrap items-center justify-end gap-2">
       {ITEMS.map((item) => {
         const activo = item.match(pathname);
         return (

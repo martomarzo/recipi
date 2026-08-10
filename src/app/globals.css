@@ -6,6 +6,8 @@ body {
   background-color: #faf7f2;
   color: #2e332e;
   -webkit-font-smoothing: antialiased;
+  /* clip (no hidden): no crea scroll container, así el header sticky sigue funcionando */
+  overflow-x: clip;
 }
 
 @layer components {
